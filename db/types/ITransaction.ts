@@ -1,12 +1,14 @@
 import {Document,Model} from "mongoose"
+import { Category } from "../../types/Category";
+import { TransactionType } from "../../types/TransactionType";
 
 export interface ITransaction {
     title:string;
     amount:number;
-    type:{type:string};
+    type:TransactionType;
     isRecurring:boolean;
     date:Date;
-    category:string;
+    category:Category;
     month:number;
     year:number;
     owner:string;

@@ -1,6 +1,6 @@
 import { Mongoose } from 'mongoose'
 import Head from 'next/head'
-import { connectToDatabase } from '../util/mongodb'
+import { connectToDatabase } from '../db'
 
 export default function Home({ isConnected }) {
   return (<div>Successfully connected to DB - {isConnected}</div>)
@@ -9,8 +9,8 @@ export default function Home({ isConnected }) {
 
 export async function getServerSideProps(context) {
   const { db } = await connectToDatabase()
-  console.log("from index page",db.connection.readyState);
+  //console.log("from index page",db.connection.readyState);
   return {
-    props: { isConnected:true },
+    props: { isConnected:db.connection.readyState===1 },
   }
 }

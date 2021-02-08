@@ -1,8 +1,8 @@
 import * as Mongoose from "mongoose";
-import { IUserDocument } from "../db/types/IUser";
-import { ITransactionDocument } from "../db/types/ITransaction";
-import UserSchema from "../db/schema/UserSchema";
-import TransactionSchema from "../db/schema/TransactionSchema";
+import { IUserDocument } from "./types/IUser";
+import { ITransactionDocument } from "./types/ITransaction";
+import UserSchema from "./schema/UserSchema";
+import TransactionSchema from "./schema/TransactionSchema";
 
 const { MONGODB_URI, MONGODB_DB } = process.env;
 
@@ -29,8 +29,12 @@ if (!cached) {
 }
 let UserModel: Mongoose.Model<IUserDocument>;
 let TransactionModel: Mongoose.Model<ITransactionDocument>;
-
-export async function connectToDatabase() {
+interface DBConnection {
+  db:Mongoose.Mongoose;
+  UserModel:Mongoose.Model<IUserDocument>;
+  TransactionModel:Mongoose.Model<ITransactionDocument>;
+}
+export async function connectToDatabase():Promise<DBConnection> {
   if (cached.conn) {
     "Using cached instance of mongo connection"
   return  {

@@ -23,7 +23,7 @@
     "typings.d.ts",
     "**/*.ts",
     "**/*.tsx"
-, "util/mongodb.ts"  ],
+, "db/index.ts"  ],
   "exclude": [
     "node_modules"
   ]
