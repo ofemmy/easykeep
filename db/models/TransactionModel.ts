@@ -17,7 +17,7 @@ export class Transaction {
   type: TransactionType;
   category: Category;
   _id?: string;
-  owner?:string
+  owner?:string|number
   constructor(
     title: string,
     amount: number,
@@ -25,7 +25,7 @@ export class Transaction {
     date: Date,
     type: TransactionType,
     category: Category,
-    ownerId:string
+    ownerId:string|number
   ) {
     this.title = title;
     this.amount = amount;

@@ -1,4 +1,4 @@
-import {Document,Model} from "mongoose"
+import {Document,Model, Types} from "mongoose"
 import { Category } from "../../types/Category";
 import { TransactionType } from "../../types/TransactionType";
 
@@ -11,7 +11,7 @@ export interface ITransaction {
     category:Category;
     month:number;
     year:number;
-    owner:string;
+    owner:Types.ObjectId;
 }
 
 export interface ITransactionDocument extends ITransaction, Document {}

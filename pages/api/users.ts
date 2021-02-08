@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import nc from "next-connect";
+import { authMiddleWare } from "../../middleware/auth";
 
 const handler = nc<NextApiRequest, NextApiResponse>({
   onNoMatch(req, res) {
@@ -9,7 +10,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({
   },
 });
 
-handler.get(async (req, res) => {
+handler.use(authMiddleWare).get(async (req, res) => {
   res.statusCode = 200;
   res.json({ msg: "working" });
 });
