@@ -20,9 +20,10 @@
   },
   "include": [
     "next-env.d.ts",
+    "typings.d.ts",
     "**/*.ts",
     "**/*.tsx"
-, "util/mongodb.js"  ],
+, "util/mongodb.ts"  ],
   "exclude": [
     "node_modules"
   ]
