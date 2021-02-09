@@ -9,20 +9,26 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { Hydrate } from "react-query/hydration";
 
-const queryClient = new QueryClient();
+//const queryClient = new QueryClient();
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const isLogin = router.pathname === "/login";
+  const queryClientRef = React.useRef() as any
+   if (!queryClientRef.current) {
+     queryClientRef.current = new QueryClient()
+   }
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClientRef.current}>
       <ChakraProvider>
         <AppStore>
           {isLogin ? (
             <Component {...pageProps} />
           ) : (
+            <Hydrate state={pageProps.dehydratedState}>
             <Layout>
               <Component {...pageProps} />
             </Layout>
+            </Hydrate>
           )}
         </AppStore>
       </ChakraProvider>

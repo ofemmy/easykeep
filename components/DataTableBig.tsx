@@ -3,7 +3,7 @@ import { MyAppContext } from '../store';
 import CashSVG from "./svgs/CashSVG";
 import {CategoryIcon} from './CategoryIcon';
 import ChevRightSVG from "./svgs/ChevRightSVG";
-import {formatNumberToCurrency} from "../lib/formatCurrency"
+import formatNumberToCurrency from "../lib/formatCurrency"
 import TransactionType from "../types/TransactionType";
 import Currency from "../types/Currency"
 import { de } from "date-fns/locale"; 

@@ -1,44 +1,44 @@
-import {Doughnut} from 'react-chartjs-2';
+import { Doughnut } from "react-chartjs-2";
 import ScaleSVG from "./svgs/ScaleSVG";
-import {formatNumberToCurrency} from "../lib/formatCurrency";
-import React,{ useContext } from 'react';
-import { MyAppContext } from '../store';
-interface DashboardPropType{
-    summary:{totalIncome:number,totalExpense:number}
+import formatNumberToCurrency from "../lib/formatCurrency";
+import React, { useContext } from "react";
+import { MyAppContext } from "../store";
+interface DashboardPropType {
+  summary: { totalIncome: number; totalExpense: number };
 }
-const Dashboard:React.FC<DashboardPropType> = ({summary})=> {
-    const graphData = {
-        labels: [
-          "Income",
-          "Expenses",
-          //'Yellow',
-          //'Test','Another'
+const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
+  const graphData = {
+    labels: [
+      "Income",
+      "Expenses",
+      //'Yellow',
+      //'Test','Another'
+    ],
+    datasets: [
+      {
+        data: [summary.totalIncome, summary.totalExpense],
+        backgroundColor: [
+          "#10a335",
+          "#ec0b3c",
+          //'#36A2EB',
+          //'#e4af2a',
+
+          // '#58197c3'
         ],
-        datasets: [
-          {
-            data: [summary.totalIncome, summary.totalExpense],
-            backgroundColor: [
-              "#10a335",
-              "#ec0b3c",
-              //'#36A2EB',
-              //'#e4af2a',
-    
-              // '#58197c3'
-            ],
-            hoverBackgroundColor: [
-              "#10a335",
-              "#ec0b3c",
-              //'#36A2EB',
-              //'#FFCE56',
-    
-              //'#58197c3'
-            ],
-          },
+        hoverBackgroundColor: [
+          "#10a335",
+          "#ec0b3c",
+          //'#36A2EB',
+          //'#FFCE56',
+
+          //'#58197c3'
         ],
-      };
-     const {month,currency}= useContext(MyAppContext)
-    return (
-        <div className="max-w-6xl px-4 sm:px-6 mt-6 lg:px-8">
+      },
+    ],
+  };
+  const { month, currency } = useContext(MyAppContext);
+  return (
+    <div className="max-w-6xl px-4 sm:px-6 mt-6 lg:px-8">
       <h2 className="text-gray-500 text-xs font-medium uppercase tracking-wide">
         {month.name}
       </h2>
@@ -108,27 +108,24 @@ const Dashboard:React.FC<DashboardPropType> = ({summary})=> {
             </div>
           </div>
         </div>
-        {
-          summary?
-        <div className="bg-white overflow-hidden shadow rounded-lg lg:py-4 py-2">
-          
-             <Doughnut
-            data={graphData}
-            options={{
-              maintainAspectRatio: false,
-              legend: {
-                position: "right",
-                align: "center",
-                labels: { usePointStyle: true },
-              },
-              layout: { padding: { right: 10, left: 10 } },
-            }}
-          />
-         
-         
-        </div>:null}
+        {summary ? (
+          <div className="bg-white overflow-hidden shadow rounded-lg lg:py-4 py-2">
+            <Doughnut
+              data={graphData}
+              options={{
+                maintainAspectRatio: false,
+                legend: {
+                  position: "right",
+                  align: "center",
+                  labels: { usePointStyle: true },
+                },
+                layout: { padding: { right: 10, left: 10 } },
+              }}
+            />
+          </div>
+        ) : null}
       </div>
     </div>
-    )
-}
-export default Dashboard
+  );
+};
+export default Dashboard;

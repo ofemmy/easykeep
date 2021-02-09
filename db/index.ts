@@ -61,7 +61,6 @@ export async function connectToDatabase():Promise<DBConnection> {
   cached.conn = await cached.promise; //this is mongoose connection NOT mongoDB Native connection
  
   const { mongoose } = cached.conn;
-  console.log("After promise resolved", mongoose.connection.readyState)
   UserModel = mongoose.model<IUserDocument>("User", UserSchema);
   TransactionModel = mongoose.model<ITransactionDocument>(
     "Transaction",

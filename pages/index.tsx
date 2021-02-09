@@ -6,7 +6,8 @@ import { MyAppContext } from "../store";
 import mongoose from "mongoose";
 import { Skeleton, Stack } from "@chakra-ui/react";
 import { fetchTransactions } from "../db/queries/fetchTransactions";
-import { useQuery } from "react-query";
+import { QueryClient, useQuery } from "react-query";
+import { dehydrate } from "react-query/hydration";
 import axios from "axios";
 import Dashboard from "../components/Dashboard";
 import useWindowWidth from "../lib/useWindowWidth";
@@ -14,15 +15,17 @@ import useWindowWidth from "../lib/useWindowWidth";
 const DataTableBig = dynamic(() => import("../components/DataTableBig"));
 const DataTableSmall = dynamic(() => import("../components/DataTableSmall"));
 
-const getTransactions = async ({ queryKey }) => {
-  const [_key, { month, skip, limit }] = queryKey;
+const getTransactions = async (config) => {
+  const {month,skip,limit} = config;
+  console.log("running",month,skip,limit);
   const res = await axios.get(
     `/api/transactions?month=${month}&skip=${skip}&limit=${limit}`
   );
+
   return res.data;
 };
 
-export default function Home({ user, pageData }) {
+export default function Home({ user,pageData }) {
   const screenWidthMatched = useWindowWidth("sm");
   const { setUser, month } = useContext(MyAppContext);
   const [skip, setSkip] = useState(2);
@@ -30,13 +33,13 @@ export default function Home({ user, pageData }) {
   useEffect(() => {
     setUser(user);
   }, [user]);
-  const { data, isLoading, isError } = useQuery(
-    ["transactions", { month: month.code, limit, skip }],
-    getTransactions,
-    { initialData: pageData }
+  const { data, isLoading, isError } = useQuery(["transactions",month,skip,limit], () =>
+    getTransactions({ skip, limit, month: 1 }),
+    {initialData:pageData,keepPreviousData:true}
   );
-  //const { transactions } = data.data;
-  console.log(data.data);
+  
+  const { summary,transactions } = data.data;
+
   return (
     <>
       <Header pageTitle="Home" />
@@ -47,17 +50,18 @@ export default function Home({ user, pageData }) {
       ) : isError ? (
         <p>Error fetching data please reload</p>
       ) : (
-        <Dashboard summary={pageData.summary} />
+        <Dashboard summary={summary} />
       )}
       <h2 className="max-w-6xl mx-auto mt-8 px-4 text-lg leading-6 font-medium text-gray-900 sm:px-6 lg:px-8">
         Recent transactions
       </h2>
-
+      
       {screenWidthMatched ? (
-        <DataTableBig transactions={pageData.transactions} />
+        <DataTableBig transactions={transactions} />
       ) : (
-        <DataTableSmall transactions={pageData.transactions} />
+        <DataTableSmall transactions={transactions} />
       )}
+      <button onClick={()=>setLimit(3)}>Test</button>
     </>
   );
 }
@@ -72,7 +76,10 @@ export const getServerSideProps = withSession(async function ({ req, res }) {
       },
     };
   }
-
+  // const queryClient = new QueryClient();
+  // await queryClient.prefetchQuery("transactions", () =>
+  //   getTransactions({   skip: 1, limit: 5, month: 1 })
+  // );
   const options = {
     limit: 5,
     skip: 0,
@@ -84,7 +91,8 @@ export const getServerSideProps = withSession(async function ({ req, res }) {
     filter,
     queryOptions: options,
   });
+  const result = {msg:"success",data:JSON.parse(JSON.stringify(data))}
   return {
-    props: { user, pageData: JSON.parse(JSON.stringify(data)) }, //went JSON crazy because Next JS is having problems with _id and date fields
+    props: { user, pageData: result}, //went JSON crazy because Next JS is having problems with _id and date fields
   };
 });
