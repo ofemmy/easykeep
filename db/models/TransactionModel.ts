@@ -1,7 +1,7 @@
 import { model } from "mongoose";
 import TransactionSchema from "../schema/TransactionSchema";
 import { ITransactionDocument } from "../types/ITransaction";
-import {TransactionType} from "../../types/TransactionType"
+import TransactionType from "../../types/TransactionType"
 import {Category} from "../../types/Category"
 // export const TransactionModel = model<ITransactionDocument>(
 //   "Transaction",
