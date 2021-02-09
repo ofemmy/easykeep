@@ -1,5 +1,6 @@
 import React, { createContext, useState } from "react";
 import { User } from "../db/models/User";
+import Currency from "../types/Currency";
 export const Months = [
   { code: 0, name: "January" },
   { code: 1, name: "February" },
@@ -19,16 +20,18 @@ type MyAppContextType = {
   changeMonth: Function;
   user: User;
   setUser: Function;
+  currency:Currency;
 };
 export const MyAppContext = createContext<MyAppContextType>(null);
 
 export default function AppStore({ children }) {
   const [month, setMonth] = useState({ code: 0, name: "January" });
   const [user, setUser] = useState(null);
+  const [currency, setCurrency] = useState(Currency.EUR)
   const changeMonth = (newMonthCode) =>
     setMonth(Months.filter((mon) => mon.code === +newMonthCode)[0]);
   return (
-    <MyAppContext.Provider value={{ month, changeMonth, user, setUser }}>
+    <MyAppContext.Provider value={{ month, changeMonth, user, setUser,currency }}>
       {children}
     </MyAppContext.Provider>
   );

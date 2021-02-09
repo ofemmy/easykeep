@@ -5,19 +5,20 @@ import nc from "next-connect";
 import { authMiddleWare } from "../../middleware/auth";
 import { connectToDatabase } from "../../db";
 import { Transaction } from "../../db/models/TransactionModel";
-import {fetchTransactions} from "../../db/queries/fetchTransactions";
+import { fetchTransactions } from "../../db/queries/fetchTransactions";
 
 const handler = nc<ExtendedRequest, ExtendedResponse>({
   onNoMatch(req, res) {
     res.status(405).json({
-      status: "error",msg: `${req.method} Not Allowed`,
+      status: "error",
+      msg: `${req.method} Not Allowed`,
     });
   },
 });
 handler
   .use(authMiddleWare)
   .get(async (req, res) => {
-    const month = +req.query.month||1;
+    const month = +req.query.month || 1;
     const limit = +req.query.limit || 5;
     const skip = +req.query.skip;
     const options = {
@@ -29,13 +30,10 @@ handler
     const ObjectId = mongoose.Types.ObjectId;
     const filter = { owner: ObjectId(req.user._id), month };
     try {
-     const{transactions,summary}= await fetchTransactions({
+      const { transactions, summary } = await fetchTransactions({
         filter,
-        model:TransactionModel,
-        exclude:["-__v"],
-        queryOptions:options,
-        withAggregate:true
-      })
+        queryOptions: options,
+      });
       res.status(200).json({
         msg: "success",
         data: { transactions, summary },
