@@ -25,6 +25,7 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-hook-form": "^6.15.1",
+    "react-query": "^3.8.2",
     "tailwindcss": "^2.0.3"
   },
   "license": "MIT",

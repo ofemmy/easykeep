@@ -8,7 +8,7 @@ import axios from "axios";
 const Navbar = () => {
   const [show, setShow] = useState(true);
   const router = useRouter();
- const {month,setMonth,user} = useContext(MyAppContext)
+ const {user} = useContext(MyAppContext)
   async function handleLogout() {
     const response = await axios("/api/logout", { method: "POST" });
     if (response.status==200) {
@@ -36,9 +36,9 @@ const Navbar = () => {
               src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
               alt=""
             /> */}
-            <Avatar size="sm" name={user.name}/>
+            <Avatar size="sm" name={user?user.name:""}/>
             <span className="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
-              <span className="sr-only">Open user menu for </span>{user.name}
+              <span className="sr-only">Open user menu for </span>{user?user.name:""}
             </span>
             <svg
               className="hidden flex-shrink-0 ml-1 h-5 w-5 text-gray-400 lg:block"

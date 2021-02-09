@@ -1,16 +1,37 @@
-import { Mongoose } from 'mongoose'
-import Head from 'next/head'
-import { connectToDatabase } from '../db'
-
-export default function Home({ isConnected }) {
-  return (<div>Successfully connected to DB - {isConnected}</div>)
-    
+import { useContext,useEffect } from "react";
+import Header from "../components/Header";
+import withSession from "../lib/withSession";
+import { MyAppContext } from "../store";
+export default function Home({ user }) {
+  const { setUser } = useContext(MyAppContext);
+  useEffect(() => {
+    setUser(user)
+  }, [user])
+  return (
+    <>
+      <Header pageTitle="Home" />
+      <p>Welcome to the home page {user.name}</p>
+    </>
+  );
 }
 
-export async function getServerSideProps(context) {
-  const { db } = await connectToDatabase()
-  //console.log("from index page",db.connection.readyState);
-  return {
-    props: { isConnected:db.connection.readyState===1 },
+export const getServerSideProps = withSession(async function ({ req, res }) {
+  const user = req.session.get("user");
+  if (!user) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
   }
-}
+  return {
+    props: { user },
+  };
+});
+// export async function getServerSideProps({req,res}) {
+
+//   return {
+//     props: { isConnected: db.connection.readyState === 1 },
+//   };
+// }

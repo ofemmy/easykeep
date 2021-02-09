@@ -1,13 +1,19 @@
-import {useForm} from 'react-hook-form';
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/router";
 import axios from "axios";
-export default function Login(){
-    const { register, handleSubmit, errors } = useForm();
-    async function onSubmit(data) {
-        const res = await axios.post("/api/login",data);
-        console.log(res.data);
+export default function Login() {
+  const router = useRouter();
+  const { register, handleSubmit, errors } = useForm();
+  async function onSubmit(data) {
+    const res = await axios.post("/api/login", data);
+    if (res.status==200) {
+      if(typeof window !== "undefined") {
+        router.push("/");
+      }
     }
-    return(
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  }
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <img
           className="mx-auto h-12 w-auto"
@@ -174,5 +180,5 @@ export default function Login(){
         </div>
       </div>
     </div>
-    )
+  );
 }
