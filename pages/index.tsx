@@ -29,9 +29,3 @@ export const getServerSideProps = withSession(async function ({ req, res }) {
     props: { user },
   };
 });
-// export async function getServerSideProps({req,res}) {
-
-//   return {
-//     props: { isConnected: db.connection.readyState === 1 },
-//   };
-// }

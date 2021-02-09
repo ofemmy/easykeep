@@ -5,6 +5,7 @@ import nc from "next-connect";
 import { authMiddleWare } from "../../middleware/auth";
 import { connectToDatabase } from "../../db";
 import { Transaction } from "../../db/models/TransactionModel";
+import {fetchTransactions} from "../../db/queries/fetchTransactions";
 
 const handler = nc<ExtendedRequest, ExtendedResponse>({
   onNoMatch(req, res) {
@@ -16,7 +17,7 @@ const handler = nc<ExtendedRequest, ExtendedResponse>({
 handler
   .use(authMiddleWare)
   .get(async (req, res) => {
-    const month = +req.query.month;
+    const month = +req.query.month||1;
     const limit = +req.query.limit || 5;
     const skip = +req.query.skip;
     const options = {
@@ -28,19 +29,16 @@ handler
     const ObjectId = mongoose.Types.ObjectId;
     const filter = { owner: ObjectId(req.user._id), month };
     try {
-      const transactions = await TransactionModel.find(
+     const{transactions,summary}= await fetchTransactions({
         filter,
-        "-__v",
-        options
-      ).lean();
-
-      const totals = await TransactionModel.aggregate([
-        { $match: filter },
-        { $group: { _id: "$type", total: { $sum: "$amount" } } },
-      ]);
+        model:TransactionModel,
+        exclude:["-__v"],
+        queryOptions:options,
+        withAggregate:true
+      })
       res.status(200).json({
         msg: "success",
-        data: { transactions, summary: parseSummary(totals) },
+        data: { transactions, summary },
       });
     } catch (error) {
       res.status(500).json({ msg: "server error", data: null });
