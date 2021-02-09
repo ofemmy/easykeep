@@ -1,6 +1,6 @@
 import {Document,Model, Types} from "mongoose"
 import { Category } from "../../types/Category";
-import { TransactionType } from "../../types/TransactionType";
+import TransactionType  from "../../types/TransactionType";
 
 export interface ITransaction {
     title:string;
