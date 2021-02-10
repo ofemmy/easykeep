@@ -17,6 +17,7 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
     datasets: [
       {
         data: [summary.totalIncome, summary.totalExpense],
+        //data:[0,0],
         backgroundColor: [
           "#10a335",
           "#ec0b3c",

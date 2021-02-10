@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { connectToDatabase } from "../../db";
 import { Mongoose, model } from "mongoose";
 import faker from "faker";
-import { TransactionType } from "../../types/TransactionType";
+import  TransactionType  from "../../types/TransactionType";
 import { Category } from "../../types/Category";
 export default async function handler(
   req: NextApiRequest,
@@ -15,10 +15,10 @@ export default async function handler(
   const { db, UserModel, TransactionModel } = await connectToDatabase();
   //clear the dataBase
 //   const userCollectionDropped = db.connection.collection("users").drop();
-  const trxCollectionDropped = db.connection.collection("transactions").drop();
+  // const trxCollectionDropped = db.connection.collection("transactions").drop();
 
   //load data into DB
-  if (trxCollectionDropped) {
+  if (true) {
     // const result = await UserModel.insertMany(generateUserData(5), {
     //   rawResult: true,
     // });

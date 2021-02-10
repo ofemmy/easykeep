@@ -26,17 +26,17 @@ handler
       skip: skip || 0,
       sort: { $natural: -1 },
     };
-    const { TransactionModel } = await connectToDatabase();
+
     const ObjectId = mongoose.Types.ObjectId;
     const filter = { owner: ObjectId(req.user._id), month };
     try {
-      const { transactions, summary } = await fetchTransactions({
+      const { transactions, summary,totalResults } = await fetchTransactions({
         filter,
         queryOptions: options,
       });
       res.status(200).json({
         msg: "success",
-        data: { transactions, summary },
+        data: { transactions, summary,totalResults },
       });
     } catch (error) {
       res.status(500).json({ msg: "server error", data: null });

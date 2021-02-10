@@ -9,13 +9,19 @@ import Currency from "../types/Currency"
 import { de } from "date-fns/locale"; 
 import {format  } from "date-fns";
 import { ITransaction } from '../db/types/ITransaction';
+import usePagination from '../lib/usePagination';
 export type DataTableProps = {
     transactions: [ITransaction & {_id:string}];
     currency?: Currency;
-    setPage?: Function;
-    page?: number;
+    goToNext?: any;
+    goToPrev?: any;
+    totalResults?: number;
+    currentCount?:{from:number,to:number};
+    isLastPage?:boolean;
+    isFirstPage?:boolean;
+
   };
-const DataTableBig:React.FC<DataTableProps> = ({transactions})=>{
+const DataTableBig:React.FC<DataTableProps> = ({transactions,goToNext,goToPrev,totalResults,currentCount,isLastPage,isFirstPage})=>{
     const {currency}= useContext(MyAppContext)
 return (
     <div className="">
@@ -85,31 +91,30 @@ return (
               >
                 <div className="hidden sm:block ">
                   <p className="text-sm text-gray-700">
-                    Showing Page
-                    <span className="font-medium px-1">{1}</span>
-                    {/* to
+                    Showing
+                    <span className="font-medium px-1">{currentCount.from}</span>
+                    to
                     <span className="font-medium px-1">
-                      {data.numOfResults}
-                    </span> */}
+                      {currentCount.to}
+                    </span>
                     of
                     <span className="font-medium px-1">
-                      22
+                      {totalResults}
                     </span>
                     results
                   </p>
                 </div>
                 <div className="flex-1 flex justify-between sm:justify-end mr-5">
                   <button
-                    // onClick={() => setPage((old) => Math.max(old - 1, 0))}
+                    onClick={goToPrev}
                     className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                    // disabled={page === 0}
+                     disabled={isFirstPage}
                   >
                     Previous
                   </button>
                   <button
-                    // onClick={() => {
-                    //   data.hasMore ? setPage((old) => old + 1) : null;
-                    // }}
+                    onClick={goToNext}
+                    disabled={isLastPage}
                     // disabled={!data.hasMore}
                     className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                   >

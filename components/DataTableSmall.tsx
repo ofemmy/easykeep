@@ -11,9 +11,7 @@ import {format  } from "date-fns";
 import { DataTableProps } from './DataTableBig';
 
 const DataTableSmall: React.FC<DataTableProps> = ({
-  transactions,
-  setPage,
-  page,
+  transactions,currentCount,isFirstPage,isLastPage,goToNext,goToPrev
 }) => {
     const {currency}= useContext(MyAppContext)
   return (
@@ -45,7 +43,7 @@ const DataTableSmall: React.FC<DataTableProps> = ({
                         <span>{format(new Date(date),"do LLL yyyy",{locale:de})}</span>
                       </span>
                     </span>
-                    <ChevRightSVG test={(e) => console.log(e)} />
+                    <ChevRightSVG />
                   </span>
                 </a>
               </li>
@@ -57,17 +55,15 @@ const DataTableSmall: React.FC<DataTableProps> = ({
           >
             <div className="flex-1 flex justify-between">
               <button
-                onClick={() => setPage((old) => Math.max(old - 1, 0))}
-                disabled={page === 0}
+                onClick={goToPrev}
+                disabled={isFirstPage}
                 className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:text-gray-500"
               >
                 Previous
               </button>
               <button
-                // onClick={() => {
-                //   data.hasMore ? setPage((old) => old + 1) : null;
-                // }}
-                // disabled={!data.hasMore}
+                onClick={goToNext}
+                disabled={isLastPage}
                 className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:text-gray-500"
               >
                 Next
