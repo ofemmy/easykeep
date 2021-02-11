@@ -1,12 +1,8 @@
 import { model } from "mongoose";
 import { connectToDatabase } from "..";
 import { ITransaction, ITransactionModel } from "../types/ITransaction";
-type QueryOption = {
-  filter: any;
-  exclude?: string[];
-  queryOptions: { limit: number; skip: number; sort: any };
-  withAggregate?: boolean;
-};
+import QueryOption from "../../types/QueryOption";
+
 type Result = {
   transactions: ITransaction[];
   summary: { totalIncome?: number; totalExpense?: number };

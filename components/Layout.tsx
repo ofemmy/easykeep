@@ -12,8 +12,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </div>
       <div className="flex-1 overflow-auto focus:outline-none" tabIndex={0}>
-          {/* <Navbar/> */}
+          <Navbar/>
         {children}
+        <div className="mt-4"></div>
       </div>
     </div>
   );

@@ -36,7 +36,7 @@ const Navbar = () => {
               src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
               alt=""
             /> */}
-            <Avatar size="sm" name={user?user.name:""}/>
+            <Avatar size="sm" name={user?user.name:""} bg="gray.500"/>
             <span className="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
               <span className="sr-only">Open user menu for </span>{user?user.name:""}
             </span>

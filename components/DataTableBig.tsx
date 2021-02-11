@@ -19,9 +19,10 @@ export type DataTableProps = {
     currentCount?:{from:number,to:number};
     isLastPage?:boolean;
     isFirstPage?:boolean;
+    showNav?:boolean
 
   };
-const DataTableBig:React.FC<DataTableProps> = ({transactions,goToNext,goToPrev,totalResults,currentCount,isLastPage,isFirstPage})=>{
+const DataTableBig:React.FC<DataTableProps> = ({transactions,goToNext,goToPrev,totalResults,currentCount,isLastPage,isFirstPage,showNav=true})=>{
     const {currency}= useContext(MyAppContext)
 return (
     <div className="">
@@ -85,7 +86,7 @@ return (
                 </tbody>
               </table>
 
-              <nav
+             {showNav? <nav
                 className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
                 aria-label="Pagination"
               >
@@ -121,7 +122,7 @@ return (
                     Next
                   </button>
                 </div>
-              </nav>
+              </nav>:null}
             </div>
           ) : (
             <div className="mt-2">

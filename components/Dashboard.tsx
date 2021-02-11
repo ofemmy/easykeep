@@ -3,6 +3,7 @@ import ScaleSVG from "./svgs/ScaleSVG";
 import formatNumberToCurrency from "../lib/formatCurrency";
 import React, { useContext } from "react";
 import { MyAppContext } from "../store";
+import Link from "next/link";
 interface DashboardPropType {
   summary: { totalIncome: number; totalExpense: number };
 }
@@ -68,12 +69,14 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
           </div>
           <div className="bg-green-400 px-5 py-3 lg:absolute bottom-0 left-0 right-0">
             <div className="text-sm">
+              <Link href="/transactions/income">
               <a
-                href="#"
                 className="font-medium text-white hover:text-gray-900"
               >
                 View all
               </a>
+              </Link>
+             
             </div>
           </div>
         </div>
@@ -100,12 +103,13 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
           </div>
           <div className="bg-red-400 px-5 py-3 lg:absolute bottom-0 left-0 right-0">
             <div className="text-sm">
+            <Link href="/transactions/expense">
               <a
-                href="#"
                 className="font-medium text-white hover:text-gray-900"
               >
                 View all
               </a>
+              </Link>
             </div>
           </div>
         </div>

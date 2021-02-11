@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
-import { ExtendedResponse } from "./../../types/ExtendedApiResponse";
-import { ExtendedRequest } from "./../../types/ExtendedApiRequest";
+import { ExtendedResponse } from "../../../types/ExtendedApiResponse";
+import { ExtendedRequest } from "../../../types/ExtendedApiRequest";
 import nc from "next-connect";
-import { authMiddleWare } from "../../middleware/auth";
-import { connectToDatabase } from "../../db";
-import { Transaction } from "../../db/models/TransactionModel";
-import { fetchTransactions } from "../../db/queries/fetchTransactions";
+import { authMiddleWare } from "../../../middleware/auth";
+import { connectToDatabase } from "../../../db";
+import { Transaction } from "../../../db/models/TransactionModel";
+import { fetchTransactions } from "../../../db/queries/fetchTransactions";
 
 const handler = nc<ExtendedRequest, ExtendedResponse>({
   onNoMatch(req, res) {
