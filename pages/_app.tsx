@@ -13,7 +13,7 @@ import { Hydrate } from "react-query/hydration";
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const isLogin = router.pathname === "/login";
-  const queryClientRef = React.useRef() as any
+ const queryClientRef = React.useRef() as any
    if (!queryClientRef.current) {
      queryClientRef.current = new QueryClient()
    }

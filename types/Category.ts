@@ -12,5 +12,7 @@ export enum Category {
     Clothing = "Clothing",
     Personal = "Personal",
     Gifts = "Gifts",
-    Income="Income"
+    Income="Income",
+    Education="Education",
+    Childcare="Childcare"
   }

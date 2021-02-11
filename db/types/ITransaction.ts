@@ -11,7 +11,7 @@ export interface ITransaction {
     category:Category;
     month:number;
     year:number;
-    owner:Types.ObjectId;
+    owner:Types.ObjectId|string;
 }
 
 export interface ITransactionDocument extends ITransaction, Document {}

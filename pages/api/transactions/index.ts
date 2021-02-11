@@ -30,13 +30,13 @@ handler
     const ObjectId = mongoose.Types.ObjectId;
     const filter = { owner: ObjectId(req.user._id), month };
     try {
-      const { transactions, summary,totalResults } = await fetchTransactions({
+      const { transactions, summary, totalResults } = await fetchTransactions({
         filter,
         queryOptions: options,
       });
       res.status(200).json({
         msg: "success",
-        data: { transactions, summary,totalResults },
+        data: { transactions, summary, totalResults },
       });
     } catch (error) {
       res.status(500).json({ msg: "server error", data: null });
@@ -46,17 +46,20 @@ handler
     const { title, amount, isRecurring, category, date, type } = req.body;
     try {
       const { TransactionModel } = await connectToDatabase();
+      console.log("here")
+      const ObjectId = mongoose.Types.ObjectId;
       const newTrx = await TransactionModel.create(
         new Transaction(
           title,
           amount,
           isRecurring,
-          date,
+          new Date(date),
           type,
           category,
           req.user._id
         )
       );
+      console.log(newTrx)
       res.status(201).json({ msg: "success", data: newTrx.toObject() });
     } catch (error) {
       res.status(500).json({ msg: "Server error" });

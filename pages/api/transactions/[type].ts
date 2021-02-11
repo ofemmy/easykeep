@@ -24,7 +24,7 @@ handler.use(authMiddleWare).get(async (req, res) => {
   const options = {
     limit,
     skip: skip || 0,
-    sort: { $natural: 1 },
+    sort: { $natural: -1 },
   };
 
   const ObjectId = mongoose.Types.ObjectId;
