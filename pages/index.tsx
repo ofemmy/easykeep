@@ -38,7 +38,7 @@ export default function Home({ user, pageData }) {
     isFirstPage,
   } = usePagination({
     totalNumofResults: pageData.data.totalResults,
-    numPerPage: 5,
+    numPerPage: 4,
   });
   useEffect(() => {
     setUser(user);
