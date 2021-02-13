@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import withSession from "../lib/withSession";
 import { MyAppContext } from "../store";
 import mongoose from "mongoose";
+import {format} from "date-fns"
 import { Skeleton, Stack } from "@chakra-ui/react";
 import { fetchTransactions } from "../db/queries/fetchTransactions";
 import { QueryClient, useQuery } from "react-query";
@@ -12,10 +13,34 @@ import axios from "axios";
 import Dashboard from "../components/Dashboard";
 import useWindowWidth from "../lib/useWindowWidth";
 import usePagination from "../lib/usePagination";
+import TitleComponent from "../components/TitleComponent";
+import AmountComponent from "../components/AmountComponent";
+import CategoryComponent from "../components/CategoryComponent";
 
 const DataTableBig = dynamic(() => import("../components/DataTableBig"));
 const DataTableSmall = dynamic(() => import("../components/DataTableSmall"));
-
+const columns =[
+  {
+      Header:"Title",
+      accessor:"title",
+      Cell:({value,row})=><TitleComponent value={value}/>
+  },
+  {
+      Header:"Amount",
+      accessor:"amount",
+      Cell:({value,row})=><AmountComponent value={value} obj={row.original}/>
+  },
+  {
+    Header:"Date",
+    accessor:row=>format(new Date(row.date),"MM/dd/yyyy")
+},
+  {
+      Header:"Category",
+      accessor:"category",
+      Cell:({value})=><CategoryComponent value={value}/>
+  },
+  
+]
 const getTransactions = async (config) => {
   const { month, skip, limit } = config;
   const res = await axios.get(
@@ -28,18 +53,8 @@ const getTransactions = async (config) => {
 export default function Home({ user, pageData }) {
   const screenWidthMatched = useWindowWidth("sm");
   const { setUser, month } = useContext(MyAppContext);
-  const {
-    skip,
-    limit,
-    goNext,
-    goPrev,
-    currentCount,
-    isLastPage,
-    isFirstPage,
-  } = usePagination({
-    totalNumofResults: pageData.data.totalResults,
-    numPerPage: 4,
-  });
+  const [limit, setLimit] = useState(5);
+  const [skip, setSkip] = useState(0)
   useEffect(() => {
     setUser(user);
   }, [user]);
@@ -49,7 +64,7 @@ export default function Home({ user, pageData }) {
     { initialData: pageData, keepPreviousData: true }
   );
   const { summary, transactions, totalResults } = data.data;
-
+  const pageCount = Math.ceil(totalResults/limit)
   return (
     <>
       <Header pageTitle="Home" />
@@ -70,23 +85,18 @@ export default function Home({ user, pageData }) {
         <DataTableBig
           transactions={transactions}
           totalResults={totalResults}
-          goToNext={goNext}
-          goToPrev={goPrev}
-          currentCount={currentCount}
-          isLastPage={isLastPage}
-          isFirstPage={isFirstPage}
+          setSkip={setSkip}
+          columnData={columns}
+          pageCount={pageCount}
+          limit={limit}
         />
       ) : (
         <DataTableSmall
           transactions={transactions}
           totalResults={totalResults}
-          goToNext={goNext}
-          goToPrev={goPrev}
-          currentCount={currentCount}
-          isLastPage={isLastPage}
-          isFirstPage={isFirstPage}
         />
       )}
+      <div className="mt-4"></div>
     </>
   );
 }

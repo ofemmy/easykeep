@@ -14,5 +14,7 @@ export const Colorcodes: Record<Category, string> = {
   Rent: "#721b1b",
   Transportation: "#4D5656",
   Utilities: "#EDBB99",
-  Income:"#5559d"
+  Income:"#5559d",
+  Education:"#ef4e",
+  Childcare:"#fb743e",
 };
