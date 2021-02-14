@@ -18,6 +18,8 @@ import axios from "axios";
 import getTransactionType from "../../lib/getTransactionType";
 import capitalize from "../../lib/capitalize";
 import CardSVG from "../../components/svgs/CardSVG";
+
+
 const fetchByTransactionType = async (config) => {
   const { month, skip, limit, type } = config;
   const res = await axios.get(
@@ -65,7 +67,7 @@ export default function TransactionType({ user, pageData }) {
                     <dt className="text-sm truncate uppercase">{`Total - ${month.name}`}</dt>
                     <dd>
                       <div className="font-medium text-lg">
-                        {formatNumberToCurrency(summary.totalIncome, currency)}
+                        {formatNumberToCurrency(totalValue, currency)}
                       </div>
                     </dd>
                   </dl>
