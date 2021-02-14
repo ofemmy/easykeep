@@ -1,4 +1,4 @@
-import React from "react";
+import React,{ useState} from "react";
 import Link from "next/link";
 import SettingsSVG from "./svgs/SettingsSVG";
 import HelpSVG from "./svgs/HelpSVG";
@@ -14,6 +14,7 @@ export type MenuItem = {
 type SidebarProps = {
 };
 const Sidebar: React.FC<SidebarProps> = (props) => {
+  const [activeLink, setActiveLink] = useState("Home")
   const links:MenuItem[] = [
     {href:"/",name:"Home",icon:HomeSVG },
     {href:"/transactions/income",name:"Incomes",icon:ScaleSVG},
@@ -42,7 +43,9 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         >
              <a
                 href=""
-                className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-blue-100 hover:text-white hover:bg-gray-600"
+                className={`group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-blue-100
+                 hover:text-white hover:bg-gray-600 ${activeLink===name?'bg-gray-600 text-white':''}`}
+                onClick={()=>setActiveLink(name)}
                 
               >
                 {icon(null)}
