@@ -16,6 +16,8 @@ import usePagination from "../lib/usePagination";
 import TitleComponent from "../components/TitleComponent";
 import AmountComponent from "../components/AmountComponent";
 import CategoryComponent from "../components/CategoryComponent";
+import getQueryOptions from "../db/lib/QueryOptions";
+import getQueryFilter from "../db/lib/QueryFilter";
 
 const DataTableBig = dynamic(() => import("../components/DataTableBig"));
 const DataTableSmall = dynamic(() => import("../components/DataTableSmall"));
@@ -61,7 +63,7 @@ export default function Home({ user, pageData }) {
   }, [user]);
   const { data, isLoading, isError } = useQuery(
     ["transactions", month, skip, limit],
-    () => getTransactions({ skip, limit, month:month.code }),
+    () => getTransactions({ skip, limit, month: month.code }),
     { initialData: pageData, keepPreviousData: true }
   );
   const { summary, transactions, totalResults } = data.data;
@@ -113,14 +115,11 @@ export const getServerSideProps = withSession(async function ({ req, res }) {
       },
     };
   }
-
-  const options = {
-    limit: 5,
-    skip: 0,
-    sort: { $natural: -1 },
-  };
-  const ObjectId = mongoose.Types.ObjectId;
-  const filter = { owner: ObjectId(user._id), month: new Date().getMonth() };
+  const options = getQueryOptions({ limit: 5, skip: 0 });
+  const filter = getQueryFilter({
+    userID: user._id,
+    month: new Date().getMonth(),
+  });
   const data = await fetchTransactions({
     filter,
     queryOptions: options,

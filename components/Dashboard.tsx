@@ -3,8 +3,9 @@ import ScaleSVG from "./svgs/ScaleSVG";
 import formatNumberToCurrency from "../lib/formatCurrency";
 import React, { useContext } from "react";
 import { MyAppContext } from "../store";
-import CardSVG from "../components/svgs/CardSVG"
+import CardSVG from "../components/svgs/CardSVG";
 import Link from "next/link";
+import Card from "./Card";
 interface DashboardPropType {
   summary: { totalIncome: number; totalExpense: number };
 }
@@ -40,7 +41,7 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
     ],
   };
   const { month, currency } = useContext(MyAppContext);
-  const isEmpty = summary.totalExpense===0 && summary.totalIncome===0;
+  const isEmpty = summary.totalExpense === 0 && summary.totalIncome === 0;
   return (
     <div className="max-w-6xl px-4 sm:px-6 mt-6 lg:px-8">
       <h2 className="text-gray-500 text-xs font-medium uppercase tracking-wide">
@@ -49,39 +50,13 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
 
       <div className="mt-4 grid lg:h-40 grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {/* Card component */}
-        <div className="bg-green-600 text-white overflow-hidden shadow rounded-lg relative">
-          <div className="p-5">
-            <div className="flex items-center lg:mt-4">
-              <div className="flex-shrink-0">
-                <ScaleSVG />
-              </div>
-              <div className="ml-1 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium truncate">
-                    Total Income
-                  </dt>
-                  <dd>
-                    <div className="text-lg font-medium">
-                      {formatNumberToCurrency(summary.totalIncome, currency)}
-                    </div>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-          <div className=" text-white uppercase border-t-2 border-gray-100 px-5 py-3 lg:absolute bottom-0 left-0 right-0">
-            <div className="text-sm">
-              <Link href="/transactions/income">
-              <a
-                className="font-medium hover:text-gray-200"
-              >
-                View all
-              </a>
-              </Link>
-             
-            </div>
-          </div>
-        </div>
+        <Card
+          icon={<ScaleSVG />}
+          bgColor="bg-green-600"
+          title="Total Income"
+          footerHref="/transactions/income"
+          value={formatNumberToCurrency(summary.totalIncome, currency)}
+        />
         {isEmpty?null : (
           <div className="bg-white overflow-hidden shadow rounded-lg lg:py-4 py-2">
             <Doughnut
@@ -98,27 +73,41 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
             />
           </div>
         )}
-        <div className="bg-red-600 text-white overflow-hidden shadow rounded-lg relative">
+        <Card
+          icon={<CardSVG />}
+          bgColor="bg-red-600"
+          title="Total Expense"
+          footerHref="/transactions/expense"
+          value={formatNumberToCurrency(summary.totalExpense, currency)}
+        />
+        {/* <div className="bg-gray-500 text-white overflow-hidden shadow rounded-lg relative">
           <div className="p-5">
             <div className="flex items-center lg:mt-4">
-              <div className="flex-shrink-0">
-                <CardSVG />
-              </div>
               <div className="ml-1 w-0 flex-1">
-                <dl>
+                <dl className="pb-1">
                   <dt className="text-sm font-medium truncate">
-                    Total Expenses
+                    Total Recurring Income
                   </dt>
                   <dd>
-                    <div className="text-lg font-medium ">
+                    <div className="text-lg font-medium">
+                      {formatNumberToCurrency(summary.totalExpense, currency)}
+                    </div>
+                  </dd>
+                </dl>
+                <dl className="pt-1">
+                  <dt className="text-sm font-medium truncate ">
+                    Total Recurring Expenses
+                  </dt>
+                  <dd>
+                    <div className="text-lg font-medium">
                       {formatNumberToCurrency(summary.totalExpense, currency)}
                     </div>
                   </dd>
                 </dl>
               </div>
             </div>
-          </div>
-          <div className="bg-red-600 border-t-2 px-5 py-3 lg:absolute bottom-0 left-0 right-0 uppercase">
+          </div> */}
+          {/* <div className="bg-gray-600 border-t-2 px-5 py-3 lg:absolute bottom-0 left-0 right-0 uppercase">
             <div className="text-sm">
             <Link href="/transactions/expense">
               <a
@@ -128,9 +117,7 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
               </a>
               </Link>
             </div>
-          </div>
-        </div>
-        
+          </div> */}
       </div>
     </div>
   );

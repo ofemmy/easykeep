@@ -1,11 +1,13 @@
-import mongoose from "mongoose";
+ import mongoose from "mongoose";
 import { ExtendedResponse } from "../../../types/ExtendedApiResponse";
 import { ExtendedRequest } from "../../../types/ExtendedApiRequest";
 import nc from "next-connect";
 import { authMiddleWare } from "../../../middleware/auth";
 import { connectToDatabase } from "../../../db";
 import { Transaction } from "../../../db/models/TransactionModel";
-import { fetchTransactions } from "../../../db/queries/fetchTransactions";
+import { fetchTransactions }  from "../../../db/queries/fetchTransactions";
+import getQueryFilter from "../../../db/lib/QueryFilter";
+import getQueryOptions from "../../../db/lib/QueryOptions";
 
 const handler = nc<ExtendedRequest, ExtendedResponse>({
   onNoMatch(req, res) {
@@ -21,14 +23,9 @@ handler
     const month = +req.query.month;
     const limit = +req.query.limit;
     const skip = +req.query.skip;
-    const options = {
-      limit,
-      skip: skip || 0,
-      sort: { $natural: -1 },
-    };
 
-    const ObjectId = mongoose.Types.ObjectId;
-    const filter = { owner: ObjectId(req.user._id), month };
+    const options =getQueryOptions({skip,limit})
+    const filter = getQueryFilter({userID:req.user._id,month})
     try {
       const { transactions, summary, totalResults } = await fetchTransactions({
         filter,

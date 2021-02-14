@@ -5,14 +5,18 @@ import QueryOption from "../../types/QueryOption";
 
 type Result = {
   transactions: ITransaction[];
-  summary: { totalIncome?: number; totalExpense?: number };
-  totalResults:number
+  summary: {
+    totalIncome?: number;
+    totalExpense?: number;
+    totalRecurring?: number;
+  };
+  totalResults: number;
 };
 export const fetchTransactions = async (
   options: QueryOption
 ): Promise<Result> => {
   let totals;
-  const {TransactionModel} = await connectToDatabase();
+  const { TransactionModel } = await connectToDatabase();
   const {
     filter,
     exclude = ["-__v"],
@@ -20,7 +24,11 @@ export const fetchTransactions = async (
     withAggregate = true,
   } = options;
   try {
-    const transactions = await TransactionModel.find(filter, exclude, queryOptions).lean();
+    const transactions = await TransactionModel.find(
+      filter,
+      exclude,
+      queryOptions
+    ).lean();
     const totalNumOfDocs = await TransactionModel.countDocuments(filter);
 
     if (withAggregate) {
@@ -29,7 +37,11 @@ export const fetchTransactions = async (
         { $group: { _id: "$type", total: { $sum: "$amount" } } },
       ]);
     }
-    return { transactions, summary: parseSummary(totals),totalResults:totalNumOfDocs };
+    return {
+      transactions,
+      summary: parseSummary(totals),
+      totalResults: totalNumOfDocs,
+    };
   } catch (error) {
     return error;
   }
