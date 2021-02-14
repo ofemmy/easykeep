@@ -1,13 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { MyAppContext } from "../store";
-import CashSVG from "./svgs/CashSVG";
-import { CategoryIcon } from "./CategoryIcon";
-import ChevRightSVG from "./svgs/ChevRightSVG";
-import formatNumberToCurrency from "../lib/formatCurrency";
-import TransactionType from "../types/TransactionType";
 import Currency from "../types/Currency";
-import { de } from "date-fns/locale";
-import { format } from "date-fns";
 import { ITransaction } from "../db/types/ITransaction";
 import { useTable, usePagination } from "react-table";
 import TableOptions from "./TableOptions";
@@ -41,9 +33,6 @@ const DataTableBig: React.FC<DataTableProps> = ({
     page,
     canPreviousPage,
     canNextPage,
-    pageOptions,
-    pageCount,
-    gotoPage,
     nextPage,
     previousPage,
     setPageSize,

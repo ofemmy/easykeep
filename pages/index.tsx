@@ -19,7 +19,7 @@ import CategoryComponent from "../components/CategoryComponent";
 
 const DataTableBig = dynamic(() => import("../components/DataTableBig"));
 const DataTableSmall = dynamic(() => import("../components/DataTableSmall"));
-const columns =[
+export const columns =[
   {
       Header:"Title",
       accessor:"title",
