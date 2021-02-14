@@ -19,11 +19,13 @@ export type DataTableProps = {
   totalResults?: number;
   showNav?: boolean;
   columnData?: any;
-  setSkip?:any
+  setSkip?:any;
+  skip?:number
 };
 const DataTableBig: React.FC<DataTableProps> = ({
   transactions,
   setSkip,
+  skip,
   limit,
   totalResults,
   showNav = true,
@@ -123,11 +125,12 @@ const DataTableBig: React.FC<DataTableProps> = ({
                     <p className="text-sm text-gray-700">
                       Showing
                       <span className="font-medium px-1">
-                        {1}
+                        {/* (pageIndex+1)+limit */}
+                        {canPreviousPage?(skip+1):1}
                       </span>
                       to
                       <span className="font-medium px-1">
-                        {"x"}
+                        {canNextPage?(skip+limit):totalResults}
                       </span>
                       of
                       <span className="font-medium px-1">{totalResults}</span>
@@ -137,7 +140,7 @@ const DataTableBig: React.FC<DataTableProps> = ({
                   <div className="flex-1 flex justify-between sm:justify-end mr-5">
                     <button
                       onClick={previousPage}
-                      className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                      className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:text-gray-200"
                       disabled={!canPreviousPage}
                     >
                       Previous
@@ -145,7 +148,6 @@ const DataTableBig: React.FC<DataTableProps> = ({
                     <button
                       onClick={nextPage}
                       disabled={!canNextPage}
-                      // disabled={!data.hasMore}
                       className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                     >
                       Next

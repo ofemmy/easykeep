@@ -89,6 +89,7 @@ export default function Home({ user, pageData }) {
           columnData={columns}
           pageCount={pageCount}
           limit={limit}
+          skip={skip}
         />
       ) : (
         <DataTableSmall

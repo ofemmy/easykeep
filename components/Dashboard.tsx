@@ -81,7 +81,22 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
             </div>
           </div>
         </div>
-
+        {summary ? (
+          <div className="bg-white overflow-hidden shadow rounded-lg lg:py-4 py-2">
+            <Doughnut
+              data={graphData}
+              options={{
+                maintainAspectRatio: false,
+                legend: {
+                  position: "right",
+                  align: "center",
+                  labels: { usePointStyle: true },
+                },
+                layout: { padding: { right: 10, left: 10 } },
+              }}
+            />
+          </div>
+        ) : null}
         <div className="bg-red-600 text-white overflow-hidden shadow rounded-lg relative">
           <div className="p-5">
             <div className="flex items-center lg:mt-4">
@@ -114,22 +129,7 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
             </div>
           </div>
         </div>
-        {summary ? (
-          <div className="bg-white overflow-hidden shadow rounded-lg lg:py-4 py-2">
-            <Doughnut
-              data={graphData}
-              options={{
-                maintainAspectRatio: false,
-                legend: {
-                  position: "right",
-                  align: "center",
-                  labels: { usePointStyle: true },
-                },
-                layout: { padding: { right: 10, left: 10 } },
-              }}
-            />
-          </div>
-        ) : null}
+        
       </div>
     </div>
   );
