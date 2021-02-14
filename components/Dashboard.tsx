@@ -40,6 +40,7 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
     ],
   };
   const { month, currency } = useContext(MyAppContext);
+  const isEmpty = summary.totalExpense===0 && summary.totalIncome===0;
   return (
     <div className="max-w-6xl px-4 sm:px-6 mt-6 lg:px-8">
       <h2 className="text-gray-500 text-xs font-medium uppercase tracking-wide">
@@ -81,7 +82,7 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
             </div>
           </div>
         </div>
-        {summary ? (
+        {isEmpty?null : (
           <div className="bg-white overflow-hidden shadow rounded-lg lg:py-4 py-2">
             <Doughnut
               data={graphData}
@@ -96,7 +97,7 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
               }}
             />
           </div>
-        ) : null}
+        )}
         <div className="bg-red-600 text-white overflow-hidden shadow rounded-lg relative">
           <div className="p-5">
             <div className="flex items-center lg:mt-4">

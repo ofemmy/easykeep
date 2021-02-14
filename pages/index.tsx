@@ -4,7 +4,7 @@ import Header from "../components/Header";
 import withSession from "../lib/withSession";
 import { MyAppContext } from "../store";
 import mongoose from "mongoose";
-import {format} from "date-fns"
+import { format } from "date-fns";
 import { Skeleton, Stack } from "@chakra-ui/react";
 import { fetchTransactions } from "../db/queries/fetchTransactions";
 import { QueryClient, useQuery } from "react-query";
@@ -19,28 +19,29 @@ import CategoryComponent from "../components/CategoryComponent";
 
 const DataTableBig = dynamic(() => import("../components/DataTableBig"));
 const DataTableSmall = dynamic(() => import("../components/DataTableSmall"));
-export const columns =[
+export const columns = [
   {
-      Header:"Title",
-      accessor:"title",
-      Cell:({value,row})=><TitleComponent value={value}/>
+    Header: "Title",
+    accessor: "title",
+    Cell: ({ value, row }) => <TitleComponent value={value} />,
   },
   {
-      Header:"Amount",
-      accessor:"amount",
-      Cell:({value,row})=><AmountComponent value={value} obj={row.original}/>
+    Header: "Amount",
+    accessor: "amount",
+    Cell: ({ value, row }) => (
+      <AmountComponent value={value} obj={row.original} />
+    ),
   },
   {
-    Header:"Date",
-    accessor:row=>format(new Date(row.date),"MM/dd/yyyy")
-},
-  {
-      Header:"Category",
-      accessor:"category",
-      Cell:({value})=><CategoryComponent value={value}/>
+    Header: "Date",
+    accessor: (row) => format(new Date(row.date), "MM/dd/yyyy"),
   },
-  
-]
+  {
+    Header: "Category",
+    accessor: "category",
+    Cell: ({ value }) => <CategoryComponent value={value} />,
+  },
+];
 const getTransactions = async (config) => {
   const { month, skip, limit } = config;
   const res = await axios.get(
@@ -54,17 +55,17 @@ export default function Home({ user, pageData }) {
   const screenWidthMatched = useWindowWidth("sm");
   const { setUser, month } = useContext(MyAppContext);
   const [limit, setLimit] = useState(5);
-  const [skip, setSkip] = useState(0)
+  const [skip, setSkip] = useState(0);
   useEffect(() => {
     setUser(user);
   }, [user]);
   const { data, isLoading, isError } = useQuery(
     ["transactions", month, skip, limit],
-    () => getTransactions({ skip, limit, month: 1 }),
+    () => getTransactions({ skip, limit, month:month.code }),
     { initialData: pageData, keepPreviousData: true }
   );
   const { summary, transactions, totalResults } = data.data;
-  const pageCount = Math.ceil(totalResults/limit)
+  const pageCount = Math.ceil(totalResults / limit);
   return (
     <>
       <Header pageTitle="Home" />
@@ -119,7 +120,7 @@ export const getServerSideProps = withSession(async function ({ req, res }) {
     sort: { $natural: -1 },
   };
   const ObjectId = mongoose.Types.ObjectId;
-  const filter = { owner: ObjectId(user._id), month: 1 };
+  const filter = { owner: ObjectId(user._id), month: new Date().getMonth() };
   const data = await fetchTransactions({
     filter,
     queryOptions: options,

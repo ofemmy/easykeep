@@ -18,8 +18,8 @@ const handler = nc<ExtendedRequest, ExtendedResponse>({
 handler
   .use(authMiddleWare)
   .get(async (req, res) => {
-    const month = +req.query.month || 1;
-    const limit = +req.query.limit || 5;
+    const month = +req.query.month;
+    const limit = +req.query.limit;
     const skip = +req.query.skip;
     const options = {
       limit,

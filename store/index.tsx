@@ -25,7 +25,8 @@ type MyAppContextType = {
 export const MyAppContext = createContext<MyAppContextType>(null);
 
 export default function AppStore({ children }) {
-  const [month, setMonth] = useState({ code: 0, name: "January" });
+  const currentMonth = Months.find(m=>m.code==new Date().getMonth())
+  const [month, setMonth] = useState(currentMonth);
   const [user, setUser] = useState(null);
   const [currency, setCurrency] = useState(Currency.EUR)
   const changeMonth = (newMonthCode) =>
@@ -36,4 +37,3 @@ export default function AppStore({ children }) {
     </MyAppContext.Provider>
   );
 }
-

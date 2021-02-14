@@ -1,8 +1,10 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo,useContext } from "react";
 import Currency from "../types/Currency";
 import { ITransaction } from "../db/types/ITransaction";
 import { useTable, usePagination } from "react-table";
 import TableOptions from "./TableOptions";
+import {MyAppContext} from "../store"
+import Link from "next/link";
 export type DataTableProps = {
   transactions: [ITransaction & { _id: string }];
   currency?: Currency;
@@ -47,6 +49,7 @@ const DataTableBig: React.FC<DataTableProps> = ({
     },
     usePagination
   );
+  const {month} = useContext(MyAppContext)
   useEffect(()=>{
   setSkip((pageIndex)*pageSize)
 },[pageIndex])
@@ -146,8 +149,15 @@ const DataTableBig: React.FC<DataTableProps> = ({
               ) : null}
             </div>
           ) : (
-            <div className="mt-2">
-              <p>No transactions yet to display</p>
+            <div className="mt-2 flex flex-wrap items-center">
+              <span>No transactions yet for {month.name}.</span>
+              <span className="ml-5">
+                <Link href="/new">
+                <a href="" className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Add your first Transaction
+                </a>
+                </Link>
+                </span>
             </div>
           )}
         </div>

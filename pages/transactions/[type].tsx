@@ -41,7 +41,7 @@ export default function TransactionType({ user, pageData }) {
 
   const { data, isLoading, isError } = useQuery(
     ["transactions", month, skip, limit, type],
-    () => fetchByTransactionType({ skip, limit, month: 1, type }),
+    () => fetchByTransactionType({ skip, limit, month: month.code, type }),
     { initialData: pageData, keepPreviousData: true }
   );
   const { summary, transactions, totalResults } = data.data;
@@ -114,7 +114,7 @@ export const getServerSideProps = withSession(async function ({
   const filter = {
     owner: ObjectId(user._id),
     type: transactionType,
-    $or: [{ month: 1 }, { isRecurring: true }],
+    $or: [{ month: new Date().getMonth() }, { isRecurring: true }],
   };
   const data = await fetchTransactions({
     filter,
