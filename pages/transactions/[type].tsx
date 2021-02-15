@@ -1,8 +1,7 @@
 import { useRouter } from "next/router";
 import { useContext, useEffect,useState } from "react";
-import mongoose from "mongoose";
-import ScaleSVG from "../../components/svgs/ScaleSVG";
-import usePagination from "../../lib/usePagination";
+import dynamic from "next/dynamic";
+import useWindowWidth from "../../lib/useWindowWidth"
 import { MyAppContext } from "../../store/index";
 import { fetchTransactions } from "../../db/queries/fetchTransactions";
 import fetchRecurringTransactionSum from "../../db/queries/fetchRecurringTransactionSum"
@@ -10,11 +9,9 @@ import withSession from "../../lib/withSession";
 import Header from "../../components/Header";
 import TrxType from "../../types/TransactionType";
 import { QueryClient, useQuery } from "react-query";
-import formatNumberToCurrency from "../../lib/formatCurrency";
 import {columns} from "../index";
 import Currency from "../../types/Currency";
 import SectionHeading from "../../components/SectionHeading";
-import DataTableBig from "../../components/DataTableBig";
 import axios from "axios";
 import getTransactionType from "../../lib/getTransactionType";
 import capitalize from "../../lib/capitalize";
@@ -23,6 +20,8 @@ import DetailsDashboard from "../../components/DetailsDashboard";
 import getQueryOptions from "../../db/lib/QueryOptions"
 import getQueryFilter from "../../db/lib/QueryFilter"
 
+const DataTableBig = dynamic(() => import("../../components/DataTableBig"));
+const DataTableSmall = dynamic(() => import("../../components/DataTableSmall"));
 
 const fetchByTransactionType = async (config) => {
   const { month, skip, limit, type } = config;
@@ -33,6 +32,7 @@ const fetchByTransactionType = async (config) => {
 };
 
 export default function TransactionType({ user, pageData }) {
+  const screenWidthMatched = useWindowWidth("sm");
   const router = useRouter();
   const { type } = router.query;
   const { setUser, month } = useContext(MyAppContext);
@@ -65,7 +65,8 @@ export default function TransactionType({ user, pageData }) {
         />
       
         <SectionHeading text={`List of ${type}`} />
-        <DataTableBig
+        {
+          screenWidthMatched?<DataTableBig
           transactions={transactions}
           totalResults={totalResults}
           setSkip={setSkip}
@@ -73,7 +74,13 @@ export default function TransactionType({ user, pageData }) {
           pageCount={pageCount}
           limit={limit}
           skip={skip}
+        />:(
+          <DataTableSmall
+          transactions={transactions}
+          totalResults={totalResults}
         />
+        )
+        }
       </div>
     </>
   );

@@ -6,7 +6,9 @@ const CustomInput = (props: any) => {
       <input
         onClick={props.onClick}
         value={props.value}
+        onChange={()=>{}}
         type="text"
+        autoComplete="off"
         name="date"
         id="date"
         className={`${

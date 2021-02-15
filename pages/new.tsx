@@ -1,7 +1,7 @@
-import React, { useContext, useState,useEffect } from "react";
-import mongoose from "mongoose"
+import React, { useContext, useState, useEffect } from "react";
+import { connectToDatabase } from "../db";
 import withSession from "../lib/withSession";
-import { useForm,Controller } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { date, number, object, string, mixed } from "yup";
 import { Category } from "../types/Category";
@@ -9,7 +9,7 @@ import TransactionType from "../types/TransactionType";
 import { useMutation } from "react-query";
 import { useToast } from "@chakra-ui/react";
 import DatePicker, { registerLocale } from "react-datepicker";
-import {ITransaction} from "../db/types/ITransaction"
+import { ITransaction } from "../db/types/ITransaction";
 import { de } from "date-fns/locale";
 import CustomInput from "../components/CustomInput";
 import "react-datepicker/dist/react-datepicker.css";
@@ -27,24 +27,28 @@ const schema = object().shape({
 });
 registerLocale("de", de);
 
-
-export default function AddTransactionForm({user}) {
-  const categories = Object.keys(Category).sort((a, b) =>
-    a.localeCompare(b)
-  );
-  const {setUser} = useContext(MyAppContext);
+export default function AddTransactionForm({ user, trxData }) {
+  const categories = Object.keys(Category).sort((a, b) => a.localeCompare(b));
+  const { setUser } = useContext(MyAppContext);
+  const [formData, setFormData] = useState<{title?:string,type?:string,amount?:number,category?:string,date?:Date}>({})
   useEffect(() => {
     setUser(user);
   }, [user]);
+  useEffect(() => {
+    let d= JSON.parse(trxData);
+   d.date = new Date(d.date);
+    setFormData(d);
+    setisRecurring(d.isRecurring)
+  },[])
   const [isRecurring, setisRecurring] = useState(false);
   const [date, setDate] = useState(new Date());
-  const { handleSubmit, register, reset, watch, errors,control } = useForm({
+  const { handleSubmit, register, reset, errors, control } = useForm({
     resolver: yupResolver(schema),
+    defaultValues:formData
   });
   const toast = useToast();
   const mutation = useMutation(
-    async (data: ITransaction) =>
-      await axios.post("/api/transactions",data),
+    async (data: ITransaction) => await axios.post("/api/transactions", data),
     {
       onSuccess: (responseData) => {
         reset(); //Reset form state
@@ -79,8 +83,8 @@ export default function AddTransactionForm({user}) {
                     New Transaction
                   </h2>
                   <p className="text-sm ">
-                    Get started by filling in the information below to create a
-                    new transaction.
+                    Fill in the information in the fields below to create a new
+                    transaction.
                   </p>
                 </div>
               </div>
@@ -100,8 +104,10 @@ export default function AddTransactionForm({user}) {
                           name="type"
                           type="radio"
                           className="focus:ring-blue-500 h-4 w-4 text-gray-600 border-gray-300"
-                          defaultValue={TransactionType.INCOME}
+                          defaultValue={formData.type}
+                          checked={formData.type===TransactionType.INCOME}
                           ref={register}
+                          onChange={()=>{}}
                         />
                         <label
                           htmlFor="income"
@@ -117,7 +123,9 @@ export default function AddTransactionForm({user}) {
                           type="radio"
                           className="focus:ring-blue-500 h-4 w-4 text-gray-600 border-gray-300"
                           ref={register}
-                          defaultValue={TransactionType.EXPENSE}
+                          defaultValue={formData.type}
+                          onChange={()=>{}}
+                          checked={formData.type===TransactionType.EXPENSE}
                         />
                         <label
                           htmlFor="expense"
@@ -144,6 +152,7 @@ export default function AddTransactionForm({user}) {
                       <input
                         type="text"
                         name="title"
+                        defaultValue={formData?.title}
                         id="title"
                         className={`${
                           errors.title ? "border-red-600" : "border-gray-300"
@@ -173,6 +182,7 @@ export default function AddTransactionForm({user}) {
                           type="text"
                           name="amount"
                           id="amount"
+                          defaultValue={formData?.amount}
                           className={`${
                             errors.amount ? "border-red-600" : "border-gray-300"
                           } focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 pr-12 sm:text-sm  rounded-sm`}
@@ -206,10 +216,19 @@ export default function AddTransactionForm({user}) {
                         Date
                       </label>
                       <Controller
-                      name="date"
-                      control={control}
-                      defaultValue=""
-                      render={({onChange,value})=>(<DatePicker onChange={onChange} selected={value} customInput={<CustomInput/>} locale="de" closeOnScroll={true}/>)}
+                        name="date"
+                        control={control}
+                        defaultValue={formData.date}
+                        value={formData.date}
+                        render={({ onChange, value }) => (
+                          <DatePicker
+                            onChange={onChange}
+                            selected={value}
+                            customInput={<CustomInput/>}
+                            locale="de"
+                            closeOnScroll={true}
+                          />
+                        )}
                       />
                       {errors.date && (
                         <p
@@ -267,9 +286,10 @@ export default function AddTransactionForm({user}) {
                           errors.category ? "border-red-600" : "border-gray-300"
                         } mt-1 block w-full pl-3 pr-10 py-2 text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-sm`}
                         ref={register}
-                        defaultValue="default"
+                        defaultValue={formData?.category}
+                        value={formData.category}
                       >
-                        <option defaultValue="default" disabled>
+                        <option defaultValue="default" disabled selected>
                           Select Category
                         </option>
                         {categories.map((cat) => (
@@ -314,16 +334,28 @@ export default function AddTransactionForm({user}) {
   );
 }
 
-export const getServerSideProps = withSession(async function ({ req, res,query }) {
-    const user = req.session.get("user");
-    if (!user) {
-      return {
-        redirect: {
-          destination: "/login",
-          permanent: false,
-        },
-      };
-    }
+export const getServerSideProps = withSession(async function ({
+  req,
+  res,
+  query,
+}) {
+  const { id } = query;
+  const user = req.session.get("user");
+  if (!user) {
     return {
-        props: { user }, //went JSON crazy because Next JS is having problems with _id and date fields
-      }})
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+  let trx={};
+  if (id) {
+    const { TransactionModel } = await connectToDatabase();
+    trx = await TransactionModel.findOne({ _id: id }).lean();
+  }
+
+  return {
+    props: { user, trxData: JSON.stringify(trx)},
+  };
+});

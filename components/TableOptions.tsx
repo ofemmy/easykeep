@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Transition } from "@headlessui/react";
-const TableOptions = () => {
+import Link from "next/link";
+const TableOptions = ({trxObject}) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="relative flex justify-end items-center">
@@ -41,8 +42,9 @@ const TableOptions = () => {
               aria-labelledby="project-options-menu-0"
             >
               <div className="py-1" role="none">
+                <Link href={`/new?id=${trxObject._id}`}>
                 <a
-                  href="#"
+                  
                   className="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                   role="menuitem"
                 >
@@ -62,6 +64,7 @@ const TableOptions = () => {
                   </svg>
                   Edit
                 </a>
+                </Link>
               </div>
               <div className="py-1" role="none">
                 <a
