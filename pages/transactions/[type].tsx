@@ -78,6 +78,7 @@ export default function TransactionType({ user, pageData }) {
           <DataTableSmall
           transactions={transactions}
           totalResults={totalResults}
+          isDetailPage={true}
         />
         )
         }

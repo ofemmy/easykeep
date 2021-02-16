@@ -99,6 +99,7 @@ export default function Home({ user, pageData }) {
         <DataTableSmall
           transactions={transactions}
           totalResults={totalResults}
+          isDetailPage={false}
         />
       )}
       <div className="mt-16"></div>

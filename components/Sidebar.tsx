@@ -19,7 +19,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
     {href:"/",name:"Home",icon:HomeSVG },
     {href:"/transactions/income",name:"Incomes",icon:ScaleSVG},
     {href:"/transactions/expense",name:"Expenses",icon:CardSVG},
-    {href:"/report",name:"Reports",icon:DocumentSVG}
+    {href:"/",name:"Reports",icon:DocumentSVG}
 
   ]
   return (

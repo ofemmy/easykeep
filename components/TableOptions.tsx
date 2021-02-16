@@ -71,7 +71,6 @@ const TableOptions = ({ trxObject }) => {
               <div className="py-1" role="none">
                 <button
                   onClick={() => {
-                    console.log("running here");
                     mutation.mutate(trxObject._id);
                     setIsOpen(false);
                     //Router.reload();
