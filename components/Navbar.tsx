@@ -36,7 +36,7 @@ const Navbar = () => {
             onClick={() => setShow(!show)}
           >
            
-            <Avatar size="sm" name={user?user.name:""} bg="orange.500"/>
+            <Avatar size="sm" name={user?String(user.name):""} bg="orange.500"/>
             <span className="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
               <span className="sr-only">Open user menu for </span>{user?user.name:""}
             </span>
