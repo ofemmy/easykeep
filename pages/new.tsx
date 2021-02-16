@@ -262,9 +262,9 @@ export default function AddTransactionForm({ user, trxData }) {
                           className="text-xs ml-2 text-blue-600"
                           onClick={(e) => {
                             e.preventDefault();
-                            setValue("date", format(new Date(), "dd.MM.yyyy"), {
-                              shouldValidate: true,
-                            });
+                            // setValue("date", format(new Date(), "dd.MM.yyyy"), {
+                            //   shouldValidate: true,
+                            // });
                           }}
                         >
                           Today
