@@ -10,6 +10,7 @@ import { ReactQueryDevtools } from "react-query/devtools";
 import { Hydrate } from "react-query/hydration";
 import LoadingComponent from "../components/LoadingComponent";
 //const queryClient = new QueryClient();
+
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const isLogin = router.pathname === "/login";

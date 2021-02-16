@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
+import {useRouter} from "next/router"
 import { connectToDatabase } from "../db";
 import withSession from "../lib/withSession";
 import { useForm, Controller } from "react-hook-form";
@@ -9,13 +10,12 @@ import TransactionType from "../types/TransactionType";
 import { useMutation } from "react-query";
 import { useToast } from "@chakra-ui/react";
 import { ITransaction } from "../db/types/ITransaction";
-import { de } from "date-fns/locale";
-import CustomInput from "../components/CustomInput";
 import "react-datepicker/dist/react-datepicker.css";
 import { MyAppContext } from "../store";
 import axios from "axios";
 import { format } from "date-fns";
 const schema = object().shape({
+  _id:string().optional(),
   title: string().required("Title is required"),
   type: mixed().required("A transaction type must be chosen"),
   amount: number()
@@ -36,8 +36,10 @@ const schema = object().shape({
       return !isNaN(value.getMonth());
     }),
 });
-
+ 
 export default function AddTransactionForm({ user, trxData }) {
+  const router = useRouter();
+  //console.log(router.query)
   const categories = Object.keys(Category).sort((a, b) => a.localeCompare(b));
   const { setUser } = useContext(MyAppContext);
   const [formData, setFormData] = useState<{
@@ -45,18 +47,27 @@ export default function AddTransactionForm({ user, trxData }) {
     type?: string;
     amount?: number;
     category?: string;
-    date?: Date;
+    date?: any;
+    _id?:string
   }>({});
+  const [isEditMode, setIsEditMode] = useState(false)
   useEffect(() => {
     setUser(user);
   }, [user]);
-  // useEffect(() => {
-  //   let d = JSON.parse(trxData);
-  //   d.date = new Date(d.date);
-  //   console.log(d);
-  //   setFormData(d);
-  //   setisRecurring(d.isRecurring);
-  // }, []);
+  useEffect(() => {
+  if(Object.keys(trxData).length >0){
+    trxData.date=new Date(trxData.date)
+    setFormData(trxData);
+    setisRecurring(trxData.isRecurring);
+  } else{
+    setFormData({})
+  }
+  }, []);
+  useEffect(() => {
+    if (router.query.id) {
+      setIsEditMode(true)
+    }
+  },[isEditMode])
   const [isRecurring, setisRecurring] = useState(false);
   const {isLoading, setisLoading} = useContext(MyAppContext);
   const { handleSubmit, register, reset, errors, setValue } = useForm({
@@ -66,12 +77,19 @@ export default function AddTransactionForm({ user, trxData }) {
   const toast = useToast();
 
   const mutation = useMutation(
-    async (data: ITransaction) => await axios.post("/api/transactions", data),
+    async (data: ITransaction) =>{ 
+      if (isEditMode) {
+        await axios.put("/api/transactions",data)
+      } else{
+        await axios.post("/api/transactions", data)
+      }
+      },
     {
       onMutate:()=>setisLoading(true),
       onSuccess: (responseData) => {
         reset(); //Reset form state
         setisLoading(false)
+        isEditMode?router.push("/"):null
         toast({
           title: "Success.",
           description: "Transaction saved successfully.",
@@ -84,10 +102,12 @@ export default function AddTransactionForm({ user, trxData }) {
       onError:()=>setisLoading(false)
     }
   );
-  const onSubmit = (data: ITransaction) => {
+  const onSubmit = (data) => {
     data.isRecurring = isRecurring;
     data.owner = user._id;
+    if(isEditMode) {data._id =formData._id}
     mutation.mutate(data);
+    
   };
   return (
     <div>
@@ -256,6 +276,7 @@ export default function AddTransactionForm({ user, trxData }) {
                         type="text"
                         name="date"
                         placeholder="DD.MM.YYYY"
+                        defaultValue={formData.date&&format(formData.date,"dd.MM.yyyy")}
                         className={`${
                           errors.date ? "border-red-600" : "border-gray-300"
                         } focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 pr-12 sm:text-sm  rounded-sm`}
@@ -391,6 +412,6 @@ export const getServerSideProps = withSession(async function ({
   }
 
   return {
-    props: { user, trxData: JSON.stringify(trx) },
+    props: { user, trxData: JSON.parse(JSON.stringify(trx)) },
   };
 });

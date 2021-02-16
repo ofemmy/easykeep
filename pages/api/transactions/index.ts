@@ -1,11 +1,11 @@
- import mongoose from "mongoose";
+import mongoose from "mongoose";
 import { ExtendedResponse } from "../../../types/ExtendedApiResponse";
 import { ExtendedRequest } from "../../../types/ExtendedApiRequest";
 import nc from "next-connect";
 import { authMiddleWare } from "../../../middleware/auth";
 import { connectToDatabase } from "../../../db";
 import { Transaction } from "../../../db/models/TransactionModel";
-import { fetchTransactions }  from "../../../db/queries/fetchTransactions";
+import { fetchTransactions } from "../../../db/queries/fetchTransactions";
 import getQueryFilter from "../../../db/lib/QueryFilter";
 import getQueryOptions from "../../../db/lib/QueryOptions";
 
@@ -24,8 +24,8 @@ handler
     const limit = +req.query.limit;
     const skip = +req.query.skip;
 
-    const options =getQueryOptions({skip,limit})
-    const filter = getQueryFilter({userID:req.user._id,month})
+    const options = getQueryOptions({ skip, limit });
+    const filter = getQueryFilter({ userID: req.user._id, month });
     try {
       const { transactions, summary, totalResults } = await fetchTransactions({
         filter,
@@ -59,6 +59,37 @@ handler
     } catch (error) {
       res.status(500).json({ msg: "Server error" });
     }
+  })
+  .put(async (req, res) => {
+    const { title, amount, isRecurring, category, date, type, _id } = req.body;
+    try {
+      const { TransactionModel } = await connectToDatabase();
+      const trx = await TransactionModel.findOne({ _id });
+      if (!trx) {
+        console.log("No trx with that id found");
+        res.status(404).json({ status: "error", msg: "resource not found" });
+      }
+      trx.title = title;
+      trx.amount = amount;
+      trx.category = category;
+      trx.date = date;
+      trx.type = type;
+      trx.isRecurring = isRecurring;
+      await trx.save();
+      res.status(200).json({ msg: "success" });
+    } catch (error) {
+      res.status(500).json({ status: "error" });
+    }
+  })
+  .delete(async (req, res) => {
+    const { _id } = req.body;
+    const { TransactionModel } = await connectToDatabase();
+    const trx = await TransactionModel.findOne({ _id });
+    if (!trx) {
+      res.status(404).json({ status: "error", msg: "resource not found" });
+    }
+    await trx.delete();
+    res.status(200).json({});
   });
 export default handler;
 

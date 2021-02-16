@@ -8,7 +8,7 @@ import { format } from "date-fns";
 import { Skeleton, Stack } from "@chakra-ui/react";
 import { fetchTransactions } from "../db/queries/fetchTransactions";
 import { QueryClient, useQuery } from "react-query";
-import { dehydrate } from "react-query/hydration";
+import useDeleteTransaction from "../lib/useDeleteTransaction";
 import axios from "axios";
 import Dashboard from "../components/Dashboard";
 import useWindowWidth from "../lib/useWindowWidth";
@@ -56,6 +56,7 @@ const getTransactions = async (config) => {
 export default function Home({ user, pageData }) {
   const screenWidthMatched = useWindowWidth("sm");
   const { setUser, month } = useContext(MyAppContext);
+  const mutation=useDeleteTransaction()
   const [limit, setLimit] = useState(5);
   const [skip, setSkip] = useState(0);
   useEffect(() => {
@@ -100,7 +101,7 @@ export default function Home({ user, pageData }) {
           totalResults={totalResults}
         />
       )}
-      <div className="mt-4"></div>
+      <div className="mt-16"></div>
     </>
   );
 }

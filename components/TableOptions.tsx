@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { Transition } from "@headlessui/react";
 import Link from "next/link";
-const TableOptions = ({trxObject}) => {
+import useDeleteTransaction from "../lib/useDeleteTransaction";
+import Router from "next/router";
+const TableOptions = ({ trxObject }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const mutation = useDeleteTransaction();
   return (
     <div className="relative flex justify-end items-center">
       <button
@@ -43,33 +46,37 @@ const TableOptions = ({trxObject}) => {
             >
               <div className="py-1" role="none">
                 <Link href={`/new?id=${trxObject._id}`}>
-                <a
-                  
-                  className="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                  role="menuitem"
-                >
-                  <svg
-                    className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
+                  <a
+                    className="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    role="menuitem"
                   >
-                    <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-                    <path
-                      fillRule="evenodd"
-                      d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Edit
-                </a>
+                    <svg
+                      className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                      <path
+                        fillRule="evenodd"
+                        d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Edit
+                  </a>
                 </Link>
               </div>
               <div className="py-1" role="none">
-                <a
-                  href="#"
-                  className="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                <button
+                  onClick={() => {
+                    console.log("running here");
+                    mutation.mutate(trxObject._id);
+                    setIsOpen(false);
+                    //Router.reload();
+                  }}
+                  className="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 w-full"
                   role="menuitem"
                 >
                   <svg
@@ -86,7 +93,7 @@ const TableOptions = ({trxObject}) => {
                     />
                   </svg>
                   Delete
-                </a>
+                </button>
               </div>
             </div>
           )}
