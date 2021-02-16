@@ -7,6 +7,7 @@ import { connectToDatabase } from "../../db";
 import { session } from "../../middleware/auth";
 
 const loginHandler = nextConnect<ExtendedRequest, ExtendedResponse>();
+//only using the session middleware here so I can write user to session after successful login
 loginHandler.use(session).post(async function (req, res) {
   const { email, password } = req.body;
   const { UserModel } = await connectToDatabase();
@@ -17,7 +18,7 @@ loginHandler.use(session).post(async function (req, res) {
       res.status(403).json({ msg: "Login Error, username/password incorrect" });
     }
     //implement bcrypt compare method here
-    const isMatch = user.password === password;
+    const isMatch = await bcrypt.compare(password,user.password);
     if (isMatch) {
       req.session.set<User>(
         "user",

@@ -43,7 +43,6 @@ handler
     const { title, amount, isRecurring, category, date, type } = req.body;
     try {
       const { TransactionModel } = await connectToDatabase();
-      console.log("here")
       const ObjectId = mongoose.Types.ObjectId;
       const newTrx = await TransactionModel.create(
         new Transaction(
@@ -56,7 +55,6 @@ handler
           req.user._id
         )
       );
-      console.log(newTrx)
       res.status(201).json({ msg: "success", data: newTrx.toObject() });
     } catch (error) {
       res.status(500).json({ msg: "Server error" });

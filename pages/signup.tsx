@@ -1,27 +1,27 @@
-import {useState} from "react"
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import axios from "axios";
 import Link from "next/link";
+import { useState } from "react";
+import useIsLoading from "../lib/useIsLoading";
 import { yupResolver } from "@hookform/resolvers/yup";
-import useIsLoading from "../lib/useIsLoading"
-import { object, string } from "yup";
-
-const loginSchema = object().shape({
-  email: string().email().required("Email is required."),
-  password: string().ensure().min(8,"Password must be at least 8 characters.").required("Password is required."),
+import { date, number, object, string, mixed } from "yup";
+const signupSchema = object().shape({
+  name: string().required("Name is required"),
+  email: string().email().required("Email is required"),
+  password: string().ensure().min(8,"Password must be at least 8 characters").required("Password is required"),
 });
 
-export default function Login() {
+export default function Signup() {
   const [serverError, setServerError] = useState("")
+ const {isLoading,setisLoading} = useIsLoading(false)
   const router = useRouter();
-  const{isLoading, setisLoading} = useIsLoading(false)
-  const { register, handleSubmit, errors } = useForm({resolver: yupResolver(loginSchema)});
+  const { register, handleSubmit, errors } = useForm({resolver: yupResolver(signupSchema)});
   async function onSubmit(data) {
     try {
       setisLoading(true)
-      const res = await axios.post("/api/login", data);
-      if (res.status==200) {
+      const res = await axios.post("/api/signup", data);
+      if (res.status==201) {
         if(typeof window !== "undefined") {
           router.push("/");
           setisLoading(false)
@@ -30,11 +30,9 @@ export default function Login() {
     } catch (error) {
       if(error.response){
         setisLoading(false)
-        setServerError("Invalid email/password.")
+        setServerError("Invalid registration details please try again")
       }
-    }
-  
-    
+    }  
   }
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -44,15 +42,40 @@ export default function Login() {
           src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
           alt="Workflow"
         />
-        <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">
-        Sign in to your account
+        <h2 className="mt-4 text-center text-3xl font-extrabold text-gray-900">
+        Sign up to get started
         </h2>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full px-12 sm:max-w-md sm:px-0">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-6">
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-12 sm:px-0">
+        
+        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
         {serverError&&<p className="mb-2 text-sm text-red-600 text-center" id="server-error">{serverError}</p>}
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate={true}>
+          <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Full name
+              </label>
+              <div className="mt-1">
+                <input
+                  id="name"
+                  name="name"
+                  type="name"
+                  autoComplete="name"
+                  required
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  ref={register}
+                />
+              </div>
+              {errors.name && (
+                      <p className="mt-2 text-sm text-red-600" id="name-error">
+                        {errors.name.message}
+                      </p>
+                    )}
+            </div>
             <div>
               <label
                 htmlFor="email"
@@ -106,19 +129,21 @@ export default function Login() {
             {isLoading&&<div className="absolute inset-0 bg-blue-100 opacity-25"></div>}
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="bg-blue-600 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                 {isLoading? "Loading..." :"Log in"}
+               {isLoading? "Loading..." :"Register"}
               </button>
             </div>
             <div className="flex items-center justify-end">
+             
               <div className="text-sm">
-              <small>Not yet registered? </small>
-              <Link href="/signup">
+              <small>Already registered? </small>
+              <Link href="/login">
               <a
-                  className="font-medium text-blue-600 hover:text-blue-500 text-xs"
+              className="text-blue-600 font-medium
+              hover:text-blue-500 text-xs"
                 >
-                 Sign up
+                Login
                 </a>
               </Link>
                 

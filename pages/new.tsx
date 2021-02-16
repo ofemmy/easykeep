@@ -8,13 +8,13 @@ import { Category } from "../types/Category";
 import TransactionType from "../types/TransactionType";
 import { useMutation } from "react-query";
 import { useToast } from "@chakra-ui/react";
-import DatePicker, { registerLocale } from "react-datepicker";
 import { ITransaction } from "../db/types/ITransaction";
 import { de } from "date-fns/locale";
 import CustomInput from "../components/CustomInput";
 import "react-datepicker/dist/react-datepicker.css";
 import { MyAppContext } from "../store";
 import axios from "axios";
+import { format } from "date-fns";
 const schema = object().shape({
   title: string().required("Title is required"),
   type: mixed().required("A transaction type must be chosen"),
@@ -23,35 +23,55 @@ const schema = object().shape({
     .positive("Invalid amount")
     .required("Amount is required"),
   category: string().required("Category is required"),
-  date: date().required("Date is required"),
+  date: mixed()
+    .required("Date is required")
+    .transform(function (value, originalValue) {
+      if (value !== null || value.trim() !== "") {
+        const [day, month, year] = value.split(".");
+        return new Date(+year, +month - 1, +day);
+      }
+      return null;
+    })
+    .test("is-valid-date", "${path} is not a valid date", (value, context) => {
+      return !isNaN(value.getMonth());
+    }),
 });
-registerLocale("de", de);
 
 export default function AddTransactionForm({ user, trxData }) {
   const categories = Object.keys(Category).sort((a, b) => a.localeCompare(b));
   const { setUser } = useContext(MyAppContext);
-  const [formData, setFormData] = useState<{title?:string,type?:string,amount?:number,category?:string,date?:Date}>({})
+  const [formData, setFormData] = useState<{
+    title?: string;
+    type?: string;
+    amount?: number;
+    category?: string;
+    date?: Date;
+  }>({});
   useEffect(() => {
     setUser(user);
   }, [user]);
-  useEffect(() => {
-    let d= JSON.parse(trxData);
-   d.date = new Date(d.date);
-    setFormData(d);
-    setisRecurring(d.isRecurring)
-  },[])
+  // useEffect(() => {
+  //   let d = JSON.parse(trxData);
+  //   d.date = new Date(d.date);
+  //   console.log(d);
+  //   setFormData(d);
+  //   setisRecurring(d.isRecurring);
+  // }, []);
   const [isRecurring, setisRecurring] = useState(false);
-  const [date, setDate] = useState(new Date());
-  const { handleSubmit, register, reset, errors, control } = useForm({
+  const {isLoading, setisLoading} = useContext(MyAppContext);
+  const { handleSubmit, register, reset, errors, setValue } = useForm({
     resolver: yupResolver(schema),
-    defaultValues:formData
+    defaultValues: formData,
   });
   const toast = useToast();
+
   const mutation = useMutation(
     async (data: ITransaction) => await axios.post("/api/transactions", data),
     {
+      onMutate:()=>setisLoading(true),
       onSuccess: (responseData) => {
         reset(); //Reset form state
+        setisLoading(false)
         toast({
           title: "Success.",
           description: "Transaction saved successfully.",
@@ -61,6 +81,7 @@ export default function AddTransactionForm({ user, trxData }) {
           position: "top-right",
         });
       },
+      onError:()=>setisLoading(false)
     }
   );
   const onSubmit = (data: ITransaction) => {
@@ -71,10 +92,10 @@ export default function AddTransactionForm({ user, trxData }) {
   return (
     <div>
       <main
-        className="flex-1 relative z-0 overflow-y-auto focus:outline-none px-10 md:px-0"
+        className="flex-1 relative z-0 overflow-y-auto focus:outline-none px-0 md:px-0"
         tabIndex={0}
       >
-        <div className="max-w-xl mx-auto mt-10">
+        <div className="max-w-xl mx-auto md:mt-4">
           <div className="flex flex-col bg-white shadow-xl overflow-y-scroll rounded-sm">
             <div className="px-4 py-6 bg-gray-700 sm:px-6 text-white">
               <div className="flex items-start justify-between space-x-3">
@@ -104,10 +125,11 @@ export default function AddTransactionForm({ user, trxData }) {
                           name="type"
                           type="radio"
                           className="focus:ring-blue-500 h-4 w-4 text-gray-600 border-gray-300"
-                          defaultValue={formData.type}
-                          checked={formData.type===TransactionType.INCOME}
+                          defaultValue={TransactionType.INCOME}
+                          checked={
+                            formData.type === TransactionType.INCOME || null
+                          }
                           ref={register}
-                          onChange={()=>{}}
                         />
                         <label
                           htmlFor="income"
@@ -123,9 +145,10 @@ export default function AddTransactionForm({ user, trxData }) {
                           type="radio"
                           className="focus:ring-blue-500 h-4 w-4 text-gray-600 border-gray-300"
                           ref={register}
-                          defaultValue={formData.type}
-                          onChange={()=>{}}
-                          checked={formData.type===TransactionType.EXPENSE}
+                          defaultValue={TransactionType.EXPENSE}
+                          checked={
+                            formData.type === TransactionType.EXPENSE || null
+                          }
                         />
                         <label
                           htmlFor="expense"
@@ -209,26 +232,34 @@ export default function AddTransactionForm({ user, trxData }) {
                       )}
                     </div>
                     <div className="w-5/12">
-                      <label
-                        htmlFor="date"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        Date
-                      </label>
-                      <Controller
+                      <div className="flex items-center justify center">
+                        <label
+                          htmlFor="date"
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          Date
+                        </label>
+                        <button
+                          className="text-xs ml-2 text-blue-600"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setValue("date", format(new Date(), "dd.MM.yyyy"), {
+                              shouldValidate: true,
+                            });
+                          }}
+                        >
+                          Today
+                        </button>
+                      </div>
+
+                      <input
+                        type="text"
                         name="date"
-                        control={control}
-                        defaultValue={formData.date}
-                        value={formData.date}
-                        render={({ onChange, value }) => (
-                          <DatePicker
-                            onChange={onChange}
-                            selected={value}
-                            customInput={<CustomInput/>}
-                            locale="de"
-                            closeOnScroll={true}
-                          />
-                        )}
+                        placeholder="DD.MM.YYYY"
+                        className={`${
+                          errors.date ? "border-red-600" : "border-gray-300"
+                        } focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 pr-12 sm:text-sm  rounded-sm`}
+                        ref={register}
                       />
                       {errors.date && (
                         <p
@@ -286,10 +317,10 @@ export default function AddTransactionForm({ user, trxData }) {
                           errors.category ? "border-red-600" : "border-gray-300"
                         } mt-1 block w-full pl-3 pr-10 py-2 text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-sm`}
                         ref={register}
-                        defaultValue={formData?.category}
+                        defaultValue={formData?.category || "default"}
                         value={formData.category}
                       >
-                        <option defaultValue="default" disabled selected>
+                        <option defaultValue="default" disabled>
                           Select Category
                         </option>
                         {categories.map((cat) => (
@@ -314,6 +345,8 @@ export default function AddTransactionForm({ user, trxData }) {
                     >
                       Cancel
                     </button>
+                    <div className="relative">
+                    {mutation.isLoading&&<div className="absolute inset-0 bg-blue-100 opacity-25"></div>}
                     <button
                       type="submit"
                       className={`ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${
@@ -321,8 +354,9 @@ export default function AddTransactionForm({ user, trxData }) {
                       } hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
                       disabled={mutation.isLoading}
                     >
-                      Save
+                     {mutation.isLoading ?"Saving...":"Save"}
                     </button>
+                    </div>
                   </div>
                 </form>
               </div>
@@ -330,6 +364,7 @@ export default function AddTransactionForm({ user, trxData }) {
           </div>
         </div>
       </main>
+      <div className="mt-16"></div>
     </div>
   );
 }
@@ -349,13 +384,13 @@ export const getServerSideProps = withSession(async function ({
       },
     };
   }
-  let trx={};
+  let trx = {};
   if (id) {
     const { TransactionModel } = await connectToDatabase();
     trx = await TransactionModel.findOne({ _id: id }).lean();
   }
 
   return {
-    props: { user, trxData: JSON.stringify(trx)},
+    props: { user, trxData: JSON.stringify(trx) },
   };
 });

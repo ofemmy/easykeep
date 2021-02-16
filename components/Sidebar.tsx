@@ -25,7 +25,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   return (
     <div className="flex flex-col flex-grow bg-gray-800 pt-5 pb-4 overflow-y-auto">
       <div className="flex items-center justify-start flex-shrink-0 px-4">
-        <h2 className="text-2xl font-extrabold text-white sm:text-3xl sm:tracking-tight lg:text-4xl">cashtrack</h2>
+        <h2 className="text-2xl font-extrabold text-white sm:text-3xl sm:tracking-tight lg:text-4xl">geldTrack</h2>
         {/* <img
           className="h-8 w-auto"
           src="https://tailwindui.com/img/logos/easywire-logo-cyan-300-mark-white-text.svg"
