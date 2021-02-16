@@ -72,7 +72,6 @@ export default function AddTransactionForm({ user, trxData }) {
   const {isLoading, setisLoading} = useContext(MyAppContext);
   const { handleSubmit, register, reset, errors, setValue } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: formData,
   });
   const toast = useToast();
 
