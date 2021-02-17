@@ -5,7 +5,7 @@ import { MyAppContext } from "../store";
 const DetailsDashboard = ({ totalRecurring, totalValue,color,typeName }) => {
   const { currency } = useContext(MyAppContext);
   return (
-    <div className={`bg-${color}-600 text-${color}-100`}>
+    <div className={`bg-${color}-600 text-white`}>
       <div className="max-w-6xl mx-auto py-4 px-4 sm:py-4 sm:px-6 lg:px-8 lg:py-6">
         <dl className="text-center sm:max-w-3xl sm:mx-auto sm:grid sm:grid-cols-5 sm:gap-8">
           <div className="flex flex-col justify-center items-center">
