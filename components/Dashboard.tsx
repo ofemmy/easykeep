@@ -43,7 +43,7 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
   const { month, currency } = useContext(MyAppContext);
   const isEmpty = summary.totalExpense === 0 && summary.totalIncome === 0;
   return (
-    <div className="max-w-6xl px-4 sm:px-6 mt-6 lg:px-8">
+    <div className="max-w-6xl px-4 sm:px-6 mt-6 lg:px-8 mx-auto">
       <h2 className="text-gray-500 text-xs font-medium uppercase tracking-wide">
         {month.name}
       </h2>

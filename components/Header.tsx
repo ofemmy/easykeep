@@ -12,7 +12,9 @@ const Header: React.FC<HeaderProps> = ({
   const {changeMonth} = useContext(MyAppContext);
   const selectMonth = (e)=>changeMonth(e.target.value);
   return (
-    <div className="border-t border-gray-200 px-4 py-4 flex items-center justify-between sm:px-6 lg:px-8 bg-white">
+    <div className="bg-white border-t border-gray-200 ">
+    <div className="px-4 mx-auto max-w-6xl">
+    <div className="px-4 py-4 flex items-center justify-between">
       <div className="flex-1 min-w-0">
         <h1 className="text-lg font-medium leading-6 text-gray-900 sm:truncate">
           {pageTitle}
@@ -34,6 +36,8 @@ const Header: React.FC<HeaderProps> = ({
           </Link>
         ))}
       </div>
+    </div>
+    </div>
     </div>
   );
 };

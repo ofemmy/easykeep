@@ -55,7 +55,7 @@ const DataTableBig: React.FC<DataTableProps> = ({
 },[pageIndex])
   return (
     <div className="">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto px-4">
         <div className="flex flex-col mt-2">
           {transactions.length > 0 ? (
             <div className="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">

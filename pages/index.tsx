@@ -76,7 +76,7 @@ export default function Home({ user, pageData }) {
     <>
       <Header pageTitle="Home" />
       {isLoading ? (
-        <div className="max-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-5">
+        <div className="max-6xl mx-auto px-4 mt-5">
           <Skeleton height="250px" />
         </div>
       ) : isError ? (
@@ -84,7 +84,7 @@ export default function Home({ user, pageData }) {
       ) : (
         <Dashboard summary={summary} />
       )}
-      <h2 className="max-w-6xl mx-auto mt-8 px-4 text-lg leading-6 font-medium text-gray-900 sm:px-6 lg:px-8">
+      <h2 className="max-w-6xl mx-auto mt-8 px-4 text-lg leading-6 font-medium text-gray-900">
         Recent transactions
       </h2>
 
