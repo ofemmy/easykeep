@@ -4,10 +4,6 @@ import CloseSVG from "./svgs/CloseSVG";
 import Link from "next/link";
 import SettingsSVG from "./svgs/SettingsSVG";
 import HelpSVG from "./svgs/HelpSVG";
-import HomeSVG from "./svgs/HomeSVG";
-import ScaleSVG from "./svgs/ScaleSVG";
-import CardSVG from "./svgs/CardSVG";
-import DocumentSVG from "./svgs/DocumentSVG";
 import { MyAppContext } from "../store";
 export type MenuItem = {
   href: string;
@@ -31,8 +27,10 @@ const MobileSidebar = () => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          {(reference) => (
-            <div className="fixed inset-0" aria-hidden="true">
+          {(ref) => (
+            <div 
+            ref={ref}
+            className="fixed inset-0" aria-hidden="true">
               <div className="absolute inset-0 bg-gray-600 opacity-75"></div>
             </div>
           )}
@@ -47,8 +45,10 @@ const MobileSidebar = () => {
           leaveFrom="translate-x-0"
           leaveTo="-translate-x-full"
         >
-          {(reference) => (
-            <div className="relative max-w-xs w-64 pt-5 pb-4 flex-1 flex flex-col bg-gray-800 min-h-screen">
+          {(ref) => (
+            <div 
+            ref={ref}
+            className="relative max-w-xs w-64 pt-5 pb-4 flex-1 flex flex-col bg-gray-800 min-h-screen">
               <div className="absolute top-0 right-0 -mr-12 pt-2">
                 <button
                   className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"

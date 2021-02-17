@@ -51,7 +51,7 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
       <div className="mt-4 grid lg:h-40 grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {/* Card component */}
         <Card
-          icon={<ScaleSVG />}
+          icon={<ScaleSVG customClasses="mr-4"/>}
           bgColor="bg-green-600"
           title="Total Income"
           footerHref="/transactions/income"
@@ -59,7 +59,7 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
         />
         
         <Card
-          icon={<CardSVG />}
+          icon={<CardSVG customClasses="mr-4"/>}
           bgColor="bg-red-600"
           title="Total Expense"
           footerHref="/transactions/expense"
