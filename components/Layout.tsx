@@ -12,7 +12,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const {isLoading} = useContext(MyAppContext)
   return (
     <div className="h-screen w-screen flex overflow-hidden bg-gray-100 pb-12 sm:pb-0">
-      {/* <MobileSidebar/> */}
+      <MobileSidebar/>
       <div className="hidden lg:flex lg:flex-shrink-0">
         <div className="flex flex-col w-64">
           <Sidebar />

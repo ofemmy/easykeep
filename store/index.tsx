@@ -1,7 +1,12 @@
 import React, { createContext, useState } from "react";
 import { User } from "../db/models/User";
 import useIsLoading from "../lib/useIsLoading";
+import HomeSVG from "../components/svgs/HomeSVG";
+import ScaleSVG from "../components/svgs/ScaleSVG";
+import CardSVG from "../components/svgs/CardSVG";
 import Currency from "../types/Currency";
+import DocumentSVG from "../components/svgs/DocumentSVG";
+import AddSVG from "../components/svgs/AddSVG";
 export const Months = [
   { code: 0, name: "January" },
   { code: 1, name: "February" },
@@ -16,6 +21,24 @@ export const Months = [
   { code: 10, name: "November" },
   { code: 11, name: "December" },
 ];
+const AppMainLinks = {
+  home: { href: "/", name: "Home", icon: <HomeSVG customClasses="mr-4" /> },
+  new: {
+    href: "/new",
+    name: "New",
+    icon: <AddSVG customClasses="mr-4" />,
+  },
+  incomes: {
+    href: "/transactions/income",
+    name: "Incomes",
+    icon: <ScaleSVG customClasses="mr-4" />,
+  },
+  expenses: {
+    href: "/transactions/expense",
+    name: "Expenses",
+    icon: <CardSVG customClasses="mr-4" />,
+  },  
+};
 type MyAppContextType = {
   month: { code: number; name: string };
   changeMonth: Function;
@@ -24,8 +47,11 @@ type MyAppContextType = {
   currency: Currency;
   isSidebarOpen: boolean;
   setSidebarOpen: Function;
-  setisLoading:Function;
+  setisLoading: Function;
   isLoading: boolean;
+  AppMainLinks: {
+    [link: string]: { href: string; name: string; icon?: JSX.Element };
+  };
 };
 export const MyAppContext = createContext<MyAppContextType>(null);
 
@@ -35,11 +61,10 @@ export default function AppStore({ children }) {
   const [user, setUser] = useState(null);
   const [currency, setCurrency] = useState(Currency.EUR);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const {isLoading, setisLoading} = useIsLoading(false);
-  const changeMonth = (newMonthCode) =>{
-    setMonth(Months.filter((mon) => mon.code === +newMonthCode)[0])};
-    const test =()=> console.log("it works")
-
+  const { isLoading, setisLoading } = useIsLoading(false);
+  const changeMonth = (newMonthCode) => {
+    setMonth(Months.filter((mon) => mon.code === +newMonthCode)[0]);
+  };
   return (
     <MyAppContext.Provider
       value={{
@@ -50,7 +75,9 @@ export default function AppStore({ children }) {
         currency,
         isSidebarOpen,
         setSidebarOpen,
-        isLoading, setisLoading
+        isLoading,
+        setisLoading,
+        AppMainLinks
       }}
     >
       {children}

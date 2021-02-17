@@ -1,5 +1,5 @@
 import { Transition } from "@headlessui/react";
-import React, { useState,useContext } from "react";
+import React, { useState, useContext } from "react";
 import CloseSVG from "./svgs/CloseSVG";
 import Link from "next/link";
 import SettingsSVG from "./svgs/SettingsSVG";
@@ -15,16 +15,12 @@ export type MenuItem = {
   icon?: React.FC<React.SVGProps<SVGSVGElement>>;
 };
 const MobileSidebar = () => {
-  const {isSidebarOpen,setSidebarOpen} = useContext(MyAppContext)
+  const { isSidebarOpen, setSidebarOpen, AppMainLinks } = useContext(
+    MyAppContext
+  );
   const [activeLink, setActiveLink] = useState("Home");
-  const links: MenuItem[] = [
-    { href: "/", name: "Home", icon: HomeSVG },
-    { href: "/transactions/income", name: "Incomes", icon: ScaleSVG },
-    { href: "/transactions/expense", name: "Expenses", icon: CardSVG },
-    { href: "/report", name: "Reports", icon: DocumentSVG },
-  ];
   return (
-    <div className={`${isSidebarOpen?"block":"hidden"}`}>
+    <div className={`${isSidebarOpen ? "block" : "hidden"}`}>
       <div className="fixed inset-0 z-40 flex">
         <Transition
           show={isSidebarOpen}
@@ -35,7 +31,7 @@ const MobileSidebar = () => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          {(ref) => (
+          {(reference) => (
             <div className="fixed inset-0" aria-hidden="true">
               <div className="absolute inset-0 bg-gray-600 opacity-75"></div>
             </div>
@@ -51,36 +47,68 @@ const MobileSidebar = () => {
           leaveFrom="translate-x-0"
           leaveTo="-translate-x-full"
         >
-          {(ref) => (
+          {(reference) => (
             <div className="relative max-w-xs w-64 pt-5 pb-4 flex-1 flex flex-col bg-gray-800 min-h-screen">
               <div className="absolute top-0 right-0 -mr-12 pt-2">
-                <button className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-                onClick={()=>setSidebarOpen(false)}
+                <button
+                  className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                  onClick={() => setSidebarOpen(false)}
                 >
                   <span className="sr-only">Close sidebar</span>
                   <CloseSVG />
                 </button>
               </div>
               <div className="flex-shrink-0 px-4 flex items-center justify-start">
-              <h2 className="text-2xl font-extrabold text-white sm:text-3xl sm:tracking-tight lg:text-4xl">cashtrack</h2>
+                <h2 className="text-2xl font-extrabold text-white sm:text-3xl sm:tracking-tight lg:text-4xl">
+                  geldTrack
+                </h2>
               </div>
-              <div className="mt-5 flex-1 h-0 overflow-y-auto">
-                <nav className="px-2 space-y-1">
-                  {links.map(({ href, name, icon }) => (
-                    <Link href={`${href}`} key={name}>
-                      <a
-                        href=""
-                        className={`group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-blue-100
-                 hover:text-white hover:bg-gray-600 ${
-                   activeLink === name ? "bg-gray-600 text-white" : ""
-                 }`}
-                        onClick={() => setActiveLink(name)}
+              <div className="mt-20 flex-1 h-0 overflow-y-auto">
+                <nav
+                  className="flex-1 flex flex-col divide-y divide-white overflow-y-auto"
+                  aria-label="Sidebar"
+                >
+                  <div className="px-2 space-y-1">
+                    {Object.keys(AppMainLinks).map((linkItem) => (
+                      <Link
+                        href={`${AppMainLinks[linkItem].href}`}
+                        key={linkItem}
                       >
-                        {icon(null)}
-                        {name}
+                        <a
+                          className={`group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-blue-100
+                 hover:text-white hover:bg-gray-600 ${
+                   activeLink === linkItem ? "bg-gray-600 text-white" : ""
+                 }`}
+                          onClick={() => {
+                            setActiveLink(linkItem);
+                            setSidebarOpen(false);
+                          }}
+                        >
+                          {AppMainLinks[linkItem].icon}
+                          {AppMainLinks[linkItem].name}
+                        </a>
+                      </Link>
+                    ))}
+                  </div>
+                  <div className="mt-6 pt-6">
+                    <div className="px-2 space-y-1">
+                      <a
+                        href="#"
+                        className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-gray-100 hover:text-white hover:bg-gray-600"
+                      >
+                        <SettingsSVG customClasses="mr-4" />
+                        Settings
                       </a>
-                    </Link>
-                  ))}
+
+                      <a
+                        href="#"
+                        className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-gray-100 hover:text-white hover:bg-gray-600"
+                      >
+                        <HelpSVG customClasses="mr-4" />
+                        Help
+                      </a>
+                    </div>
+                  </div>
                 </nav>
               </div>
             </div>

@@ -23,9 +23,17 @@ const Navbar = () => {
   }
   return (
     <div className="relative z-10 flex-shrink-0 flex h-16 bg-white border-b border-gray-200 lg:border-none justify-between lg:justify-end">
-     <div className="lg:hidden flex items-center justify-start flex-shrink-0 px-4">
-        <h2 className="text-2xl font-extrabold text-gray-700 sm:text-3xl sm:tracking-tight lg:text-4xl">geldTrack</h2>
+      
+     <button className=" hidden md:block px-4 border-r border-gray-200 text-gray-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-100 lg:hidden"
+     onClick={()=>setSidebarOpen(true)}
+     >
+        <span className="sr-only">Open sidebar</span>
+        <MenuAltSVG />
+      </button>
+      <div className="flex items-center justify-center flex-shrink-0 px-4">
+        <h2 className="md:hidden text-2xl font-extrabold text-gray-700 sm:text-3xl sm:tracking-tight lg:text-4xl">geldTrack</h2>
       </div>
+ 
       <div className="relative lg:p-2 py-4 px-2 mr-3">
         <div>
           <button

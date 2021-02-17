@@ -55,13 +55,16 @@ const getTransactions = async (config) => {
 
 export default function Home({ user, pageData }) {
   const screenWidthMatched = useWindowWidth("sm");
-  const { setUser, month } = useContext(MyAppContext);
-  const mutation=useDeleteTransaction()
+  const { setUser, month, setSidebarOpen } = useContext(MyAppContext);
+  const mutation = useDeleteTransaction();
   const [limit, setLimit] = useState(5);
   const [skip, setSkip] = useState(0);
   useEffect(() => {
     setUser(user);
   }, [user]);
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, []);
   const { data, isLoading, isError } = useQuery(
     ["transactions", month, skip, limit],
     () => getTransactions({ skip, limit, month: month.code }),
