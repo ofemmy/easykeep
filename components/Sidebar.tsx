@@ -9,17 +9,17 @@ import DocumentSVG from "./svgs/DocumentSVG";
 export type MenuItem = {
   href: string;
   name: string;
-  icon?: React.FC<React.SVGProps<SVGSVGElement>>;
+  icon?: any;
 };
 type SidebarProps = {
 };
 const Sidebar: React.FC<SidebarProps> = (props) => {
   const [activeLink, setActiveLink] = useState("Home")
   const links:MenuItem[] = [
-    {href:"/",name:"Home",icon:HomeSVG },
-    {href:"/transactions/income",name:"Incomes",icon:ScaleSVG},
-    {href:"/transactions/expense",name:"Expenses",icon:CardSVG},
-    {href:"/",name:"Reports",icon:DocumentSVG}
+    {href:"/",name:"Home",icon:<HomeSVG customClasses="mr-4"/> },
+    {href:"/transactions/income",name:"Incomes",icon:<ScaleSVG customClasses="mr-4"/>},
+    {href:"/transactions/expense",name:"Expenses",icon:<CardSVG customClasses="mr-4"/>},
+    {href:"/",name:"Reports",icon:<DocumentSVG customClasses="mr-4"/>}
 
   ]
   return (
@@ -48,7 +48,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                 onClick={()=>setActiveLink(name)}
                 
               >
-                {icon(null)}
+                {icon}
                 {name}
               </a> 
             </Link>
@@ -60,7 +60,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               href="#"
               className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-gray-100 hover:text-white hover:bg-gray-600"
             >
-              <SettingsSVG />
+              <SettingsSVG customClasses="mr-4"/>
               Settings
             </a>
 
@@ -68,7 +68,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               href="#"
               className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-gray-100 hover:text-white hover:bg-gray-600"
             >
-              <HelpSVG />
+              <HelpSVG customClasses="mr-4"/>
               Help
             </a>
           </div>

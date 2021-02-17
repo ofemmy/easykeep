@@ -7,11 +7,11 @@ import AddSVG from "./svgs/AddSVG";
 
 const LowerNavbar = () => {
   return (
-    <div className="lg:hidden mx-auto h-12">
+    <div className="lg:hidden mx-auto h-12 rounded-sm">
       <div className="fixed bg-gradient-to-br from-gray-300 shadow-lg inset-x-0 z-40 bottom-0 flex items-center justify-center">
         <div className="space-x-4 flex text-gray-700">
           <Link href="/">
-            <a className="px-3 font-medium flex flex-col items-center justify-center py-2 hover:text-gray-100 hover:bg-blueGray-500">
+            <a className="px-4 font-medium flex flex-col items-center justify-center py-2 hover:text-gray-100 hover:bg-blueGray-500">
               <span className="">
                 <HomeSVG/>
               </span>
@@ -23,7 +23,7 @@ const LowerNavbar = () => {
           </Link>
          
           <Link href="/transactions/income">
-            <a className="flex flex-col items-center justify-center px-3 text-xs font-medium hover:text-gray-100 hover:bg-blueGray-500">
+            <a className="flex flex-col items-center justify-center px-4 text-xs font-medium hover:text-gray-100 hover:bg-blueGray-500">
               <span>
                 <CashSVG/>
               </span>
@@ -34,7 +34,7 @@ const LowerNavbar = () => {
             </a>
            </Link>
            <Link href="/transactions/expense">
-            <a className="flex flex-col items-center justify-center px-3 text-xs font-medium hover:text-gray-100 hover:bg-blueGray-500">
+            <a className="flex flex-col items-center justify-center px-4 text-xs font-medium hover:text-gray-100 hover:bg-blueGray-500">
               <span>
                 <CardSVG/>
               </span>
@@ -45,7 +45,7 @@ const LowerNavbar = () => {
             </a>
            </Link>
            <Link href="/new">
-            <a className="flex flex-col items-center justify-center px-3 text-xs font-medium hover:text-gray-100 hover:bg-blueGray-500">
+            <a className="flex flex-col items-center justify-center px-4 text-xs font-medium hover:text-gray-100 hover:bg-blueGray-500">
               <span>
                 <AddSVG/>
               </span>

@@ -57,8 +57,16 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
           footerHref="/transactions/income"
           value={formatNumberToCurrency(summary.totalIncome, currency)}
         />
+        
+        <Card
+          icon={<CardSVG />}
+          bgColor="bg-red-600"
+          title="Total Expense"
+          footerHref="/transactions/expense"
+          value={formatNumberToCurrency(summary.totalExpense, currency)}
+        />
         {isEmpty?null : (
-          <div className="bg-white overflow-hidden shadow rounded-lg lg:py-4 py-2">
+          <div className="hidden lg:block bg-white overflow-hidden shadow rounded-lg lg:py-4 py-2">
             <Doughnut
               data={graphData}
               options={{
@@ -73,13 +81,6 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
             />
           </div>
         )}
-        <Card
-          icon={<CardSVG />}
-          bgColor="bg-red-600"
-          title="Total Expense"
-          footerHref="/transactions/expense"
-          value={formatNumberToCurrency(summary.totalExpense, currency)}
-        />
         {/* <div className="bg-gray-500 text-white overflow-hidden shadow rounded-lg relative">
           <div className="p-5">
             <div className="flex items-center lg:mt-4">
