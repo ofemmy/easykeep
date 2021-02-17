@@ -3,7 +3,7 @@ import React, { useState, useContext } from "react";
 import CloseSVG from "./svgs/CloseSVG";
 import Link from "next/link";
 import SettingsSVG from "./svgs/SettingsSVG";
-import HelpSVG from "./svgs/HelpSVG";
+import LogoutSVG from "./svgs/LogoutSVG";
 import { MyAppContext } from "../store";
 export type MenuItem = {
   href: string;
@@ -28,9 +28,7 @@ const MobileSidebar = () => {
           leaveTo="opacity-0"
         >
           {(ref) => (
-            <div 
-            ref={ref}
-            className="fixed inset-0" aria-hidden="true">
+            <div ref={ref} className="fixed inset-0" aria-hidden="true">
               <div className="absolute inset-0 bg-gray-600 opacity-75"></div>
             </div>
           )}
@@ -46,9 +44,10 @@ const MobileSidebar = () => {
           leaveTo="-translate-x-full"
         >
           {(ref) => (
-            <div 
-            ref={ref}
-            className="relative max-w-xs w-64 pt-5 pb-4 flex-1 flex flex-col bg-gray-800 min-h-screen">
+            <div
+              ref={ref}
+              className="relative max-w-xs w-64 pt-5 pb-4 flex-1 flex flex-col bg-gray-800 min-h-screen"
+            >
               <div className="absolute top-0 right-0 -mr-12 pt-2">
                 <button
                   className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
@@ -92,21 +91,18 @@ const MobileSidebar = () => {
                   </div>
                   <div className="mt-6 pt-6">
                     <div className="px-2 space-y-1">
-                      <a
-                        href="#"
-                        className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-gray-100 hover:text-white hover:bg-gray-600"
-                      >
-                        <SettingsSVG customClasses="mr-4" />
-                        Settings
-                      </a>
-
-                      <a
-                        href="#"
-                        className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-gray-100 hover:text-white hover:bg-gray-600"
-                      >
-                        <HelpSVG customClasses="mr-4" />
-                        Help
-                      </a>
+                      <Link href="/settings">
+                        <a className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-gray-100 hover:text-white hover:bg-gray-600">
+                          <SettingsSVG customClasses="mr-4" />
+                          Settings
+                        </a>
+                      </Link>
+                      <Link href="/logout">
+                        <a className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-gray-700 bg-white hover:text-white hover:bg-gray-600">
+                          <LogoutSVG customClasses="mr-4" />
+                          Logout
+                        </a>
+                      </Link>
                     </div>
                   </div>
                 </nav>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import SettingsSVG from "./svgs/SettingsSVG";
 import HelpSVG from "./svgs/HelpSVG";
 import { MyAppContext } from "../store";
+import LogoutSVG from "./svgs/LogoutSVG";
 
 type SidebarProps = {
 };
@@ -37,21 +38,22 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         </div>
         <div className="mt-6 pt-6">
           <div className="px-2 space-y-1">
+            <Link href="/settings">
             <a
-              href="#"
               className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-gray-100 hover:text-white hover:bg-gray-600"
             >
               <SettingsSVG customClasses="mr-4"/>
               Settings
             </a>
-
+            </Link>
+            <Link href="/logout">
             <a
-              href="#"
-              className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-gray-100 hover:text-white hover:bg-gray-600"
+              className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-gray-700 bg-white hover:text-white hover:bg-gray-600"
             >
-              <HelpSVG customClasses="mr-4"/>
-              Help
+             <LogoutSVG customClasses="mr-4"/>
+              Logout
             </a>
+            </Link>
           </div>
         </div>
       </nav>
