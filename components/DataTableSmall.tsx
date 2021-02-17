@@ -30,7 +30,7 @@ const DataTableSmall: React.FC<DataTableProps & { isDetailPage: boolean }> = ({
   return (
     <>
       {transactions.length > 0 ? (
-        <div className="shadow sm:hidden px-4">
+        <div className="sm:hidden px-4">
           <ul className="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
             {transactions.map(({ _id, title, amount, date, type }) => (
               <li key={_id}>

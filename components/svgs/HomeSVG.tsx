@@ -3,7 +3,7 @@ import React from "react";
 const HomeSVG = () => {
   return (
     <svg
-      className="mr-4 h-6 w-6 text-cyan-200"
+      className="h-6 w-6"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

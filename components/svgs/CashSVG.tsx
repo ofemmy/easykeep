@@ -3,7 +3,7 @@ import React from "react";
 const CashSVG = () => {
   return (
     <svg
-      className="flex-shrink-0 h-5 w-5 text-gray-400"
+      className="flex-shrink-0 h-6 w-6"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 20 20"
       fill="currentColor"

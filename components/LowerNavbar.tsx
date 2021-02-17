@@ -1,37 +1,59 @@
 import Link from "next/link";
 import React from "react";
+import CardSVG from "./svgs/CardSVG";
+import CashSVG from "./svgs/CashSVG";
+import HomeSVG from "./svgs/HomeSVG";
+import AddSVG from "./svgs/AddSVG";
 
 const LowerNavbar = () => {
   return (
-    <div className="lg:hidden mx-auto">
-      <div className="fixed bg-gray-900 inset-x-0 z-40 bottom-0 flex items-center justify-center py-4">
-        <div className="space-x-4">
+    <div className="lg:hidden mx-auto h-12">
+      <div className="fixed bg-gradient-to-br from-blueGray-300 via-transparent shadow-lg inset-x-0 z-40 bottom-0 flex items-center justify-center">
+        <div className="space-x-4 flex text-gray-700">
           <Link href="/">
-            <a className="bg-gray-900 text-white px-3 rounded-md text-sm font-medium">
+            <a className="px-3 font-medium flex flex-col items-center justify-center py-2 hover:text-gray-100 hover:bg-blueGray-500">
+              <span className="">
+                <HomeSVG/>
+              </span>
+              <span className="text-xs">
               Home
+              </span>
+              
             </a>
           </Link>
+         
           <Link href="/transactions/income">
-            <a className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+            <a className="flex flex-col items-center justify-center px-3 text-xs font-medium hover:text-gray-100 hover:bg-blueGray-500">
+              <span>
+                <CashSVG/>
+              </span>
+              <span className="text-xs">
               Income
+              </span>
+              
             </a>
-          </Link>
-          <Link href="/transactions/expense">
-            <a
-              href="#"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-            >
+           </Link>
+           <Link href="/transactions/expense">
+            <a className="flex flex-col items-center justify-center px-3 text-xs font-medium hover:text-gray-100 hover:bg-blueGray-500">
+              <span>
+                <CardSVG/>
+              </span>
+              <span className="text-xs">
               Expenses
+              </span>
+              
             </a>
-          </Link>
-          <Link href="/new">
-            <a
-              href="#"
-              className="bg-gray-700 text-white px-3 py-2 rounded-md text-sm font-medium"
-            >
-              Add New Item
+           </Link>
+           <Link href="/new">
+            <a className="flex flex-col items-center justify-center px-3 text-xs font-medium hover:text-gray-100 hover:bg-blueGray-500">
+              <span>
+                <AddSVG/>
+              </span>
+              <span className="text-xs">
+              New Item
+              </span>
             </a>
-          </Link>
+           </Link>
         </div>
       </div>
     </div>
