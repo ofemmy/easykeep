@@ -3,17 +3,18 @@ import { ExtendedRequest } from "../../types/ExtendedApiRequest";
 import { ExtendedResponse } from "../../types/ExtendedApiResponse";
 import nextConnect from "next-connect";
 import bcrypt from "bcryptjs";
-import { connectToDatabase } from "../../db";
 import { session } from "../../middleware/auth";
+import prisma from "../../db/prisma";
 
 const signupHandler = nextConnect<ExtendedRequest, ExtendedResponse>();
 //only using the session middleware here so I can write user to session after successful signup
 signupHandler.use(session).post(async function (req, res) {
   const { email, password, name } = req.body;
-  const { UserModel } = await connectToDatabase();
+
   try {
-    const user = await UserModel.findOne({ email });
-    console.log(user);
+    const user = await prisma.user.findFirst({
+      where: { email },
+    });
     if (user) {
       return res
         .status(400)
@@ -25,24 +26,13 @@ signupHandler.use(session).post(async function (req, res) {
         .json({ status: "error", message: "Password length too small" });
     }
     const hashedPassword = await bcrypt.hash(password, 8);
-    const response = await UserModel.create({
-      email,
-      password: hashedPassword,
-      name,
+    const newUser = await prisma.user.create({
+      data: { email, password: hashedPassword, name },
+      select: { email: true, name: true, id: true },
     });
-    if (response._id) {
-      req.session.set<User>(
-        "user",
-        response.toObject({
-          versionKey: false,
-          transform: (doc) => {
-            doc.password = null;
-            return doc;
-          },
-        })
-      );
+    if (newUser) {
+      req.session.set<User>("user", newUser);
     }
-    console.log("here");
     await req.session.save();
     return res
       .status(201)

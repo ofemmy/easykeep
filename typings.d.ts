@@ -1,6 +1,7 @@
 import { Mongoose } from "mongoose";
 import { ITransactionDocument } from "./db/types/ITransaction";
 import { IUserDocument } from "./db/types/IUser";
+import { PrismaClient } from "@prisma/client";
 
 declare global {
   type Cached = {
@@ -14,6 +15,7 @@ declare global {
   namespace NodeJS {
     interface Global {
       mongo: Cached;
+      prisma: PrismaClient;
     }
   }
 }
