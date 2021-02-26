@@ -3,21 +3,18 @@ import { useContext, useEffect, useState } from "react";
 import Header from "../components/Header";
 import withSession from "../lib/withSession";
 import { MyAppContext } from "../store";
-import mongoose from "mongoose";
 import { format } from "date-fns";
 import { Skeleton, Stack } from "@chakra-ui/react";
-import { fetchTransactions } from "../db/queries/fetchTransactions";
+import { fetchTransactions, fetchTransactionsWithPrisma } from "../db/queries/fetchTransactions";
 import { QueryClient, useQuery } from "react-query";
 import useDeleteTransaction from "../lib/useDeleteTransaction";
 import axios from "axios";
 import Dashboard from "../components/Dashboard";
 import useWindowWidth from "../lib/useWindowWidth";
-import usePagination from "../lib/usePagination";
 import TitleComponent from "../components/TitleComponent";
 import AmountComponent from "../components/AmountComponent";
 import CategoryComponent from "../components/CategoryComponent";
-import getQueryOptions from "../db/lib/QueryOptions";
-import getQueryFilter from "../db/lib/QueryFilter";
+
 
 const DataTableBig = dynamic(() => import("../components/DataTableBig"));
 const DataTableSmall = dynamic(() => import("../components/DataTableSmall"));
@@ -120,15 +117,9 @@ export const getServerSideProps = withSession(async function ({ req, res }) {
       },
     };
   }
-  const options = getQueryOptions({ limit: 5, skip: 0 });
-  const filter = getQueryFilter({
-    userID: user._id,
-    month: new Date().getMonth(),
-  });
-  const data = await fetchTransactions({
-    filter,
-    queryOptions: options,
-  });
+ 
+  const requestOptions = {limit:5,skip:0,ownerId:user.id,month:new Date().getMonth()}
+  const data = await fetchTransactionsWithPrisma(requestOptions);
   const result = { msg: "success", data: JSON.parse(JSON.stringify(data)) };
   return {
     props: { user, pageData: result }, //went JSON crazy because Next JS is having problems with _id and date fields

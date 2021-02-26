@@ -21,7 +21,7 @@ loginHandler.use(session).post(async function (req, res) {
     //implement bcrypt compare method here
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
-      const userWithoutPassword = pick(user, ["name", "email"]);
+      const userWithoutPassword = pick(user, ["name", "email", "id"]);
       req.session.set<User>("user", userWithoutPassword);
       await req.session.save();
       return res

@@ -1,5 +1,6 @@
+import { User } from "@prisma/client";
 import { NextApiRequest } from "next";
-import { User } from "../db/models/User";
+
 export interface ExtendedRequest extends NextApiRequest {
     user:User;
     session: {

@@ -5,8 +5,9 @@ import { useTable, usePagination } from "react-table";
 import TableOptions from "./TableOptions";
 import {MyAppContext} from "../store"
 import Link from "next/link";
+import { Transaction } from "@prisma/client";
 export type DataTableProps = {
-  transactions: [ITransaction & { _id: string }];
+  transactions: Transaction[];
   currency?: Currency;
   pageCount?: any;
   limit?: number;

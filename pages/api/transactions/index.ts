@@ -5,9 +5,10 @@ import nc from "next-connect";
 import { authMiddleWare } from "../../../middleware/auth";
 import { connectToDatabase } from "../../../db";
 import { Transaction } from "../../../db/models/TransactionModel";
-import { fetchTransactions } from "../../../db/queries/fetchTransactions";
-import getQueryFilter from "../../../db/lib/QueryFilter";
-import getQueryOptions from "../../../db/lib/QueryOptions";
+import {
+  fetchTransactions,
+  fetchTransactionsWithPrisma,
+} from "../../../db/queries/fetchTransactions";
 
 const handler = nc<ExtendedRequest, ExtendedResponse>({
   onNoMatch(req, res) {
@@ -24,42 +25,46 @@ handler
     const limit = +req.query.limit;
     const skip = +req.query.skip;
 
-    const options = getQueryOptions({ skip, limit });
-    const filter = getQueryFilter({ userID: req.user._id, month });
     try {
-      const { transactions, summary, totalResults } = await fetchTransactions({
-        filter,
-        queryOptions: options,
+      const {transactions, summary, totalResults} = await fetchTransactionsWithPrisma({
+        ownerId: req.user.id,
+        skip,
+        limit,
+        month,
       });
       res.status(200).json({
         msg: "success",
-        data: { transactions, summary, totalResults },
+        data: {
+          transactions,
+          summary,
+          totalResults
+        },
       });
     } catch (error) {
       res.status(500).json({ msg: "server error", data: null });
     }
   })
-  .post(async (req, res) => {
-    const { title, amount, isRecurring, category, date, type } = req.body;
-    try {
-      const { TransactionModel } = await connectToDatabase();
-      const ObjectId = mongoose.Types.ObjectId;
-      const newTrx = await TransactionModel.create(
-        new Transaction(
-          title,
-          amount,
-          isRecurring,
-          new Date(date),
-          type,
-          category,
-          req.user._id
-        )
-      );
-      res.status(201).json({ msg: "success", data: newTrx.toObject() });
-    } catch (error) {
-      res.status(500).json({ msg: "Server error" });
-    }
-  })
+  // .post(async (req, res) => {
+  //   const { title, amount, isRecurring, category, date, type } = req.body;
+  //   try {
+  //     const { TransactionModel } = await connectToDatabase();
+  //     const ObjectId = mongoose.Types.ObjectId;
+  //     const newTrx = await TransactionModel.create(
+  //       new Transaction(
+  //         title,
+  //         amount,
+  //         isRecurring,
+  //         new Date(date),
+  //         type,
+  //         category,
+  //         req.user._id
+  //       )
+  //     );
+  //     res.status(201).json({ msg: "success", data: newTrx.toObject() });
+  //   } catch (error) {
+  //     res.status(500).json({ msg: "Server error" });
+  //   }
+  // })
   .put(async (req, res) => {
     const { title, amount, isRecurring, category, date, type, _id } = req.body;
     try {
