@@ -9,7 +9,7 @@ import { object, string } from "yup";
 
 const loginSchema = object().shape({
   email: string().email().required("Email is required."),
-  password: string().ensure().min(8,"Password must be at least 8 characters.").required("Password is required."),
+  password: string().required("Password is required."),
 });
 
 export default function Login() {

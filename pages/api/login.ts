@@ -3,33 +3,26 @@ import { ExtendedRequest } from "../../types/ExtendedApiRequest";
 import { ExtendedResponse } from "../../types/ExtendedApiResponse";
 import nextConnect from "next-connect";
 import bcrypt from "bcryptjs";
-import { connectToDatabase } from "../../db";
+import { pick } from "lodash";
 import { session } from "../../middleware/auth";
+import prisma from "../../db/prisma";
 
 const loginHandler = nextConnect<ExtendedRequest, ExtendedResponse>();
 //only using the session middleware here so I can write user to session after successful login
 loginHandler.use(session).post(async function (req, res) {
   const { email, password } = req.body;
-  const { UserModel } = await connectToDatabase();
   try {
-    const user = await UserModel.findOne({ email }).exec();
-
+    const user = await prisma.user.findFirst({
+      where: { email },
+    });
     if (!user) {
       res.status(403).json({ msg: "Login Error, username/password incorrect" });
     }
     //implement bcrypt compare method here
-    const isMatch = await bcrypt.compare(password,user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
-      req.session.set<User>(
-        "user",
-        user.toObject({
-          versionKey: false,
-          transform: (doc) => {
-            doc.password = null;
-            return doc;
-          },
-        })
-      );
+      const userWithoutPassword = pick(user, ["name", "email"]);
+      req.session.set<User>("user", userWithoutPassword);
       await req.session.save();
       return res
         .status(200)
