@@ -1,10 +1,11 @@
-import TransactionType from "../types/TransactionType";
+import { TransactionType } from "@prisma/client";
+
 export default function getTransactionType(query: string) {
   let result;
   if (query.toLowerCase() == "income") {
-    result = TransactionType.INCOME;
+    result = TransactionType.Income;
   } else if (query.toLowerCase() == "expense") {
-    result = TransactionType.EXPENSE;
+    result = TransactionType.Expense;
   } else {
     throw new Error("Invalid argument");
   }

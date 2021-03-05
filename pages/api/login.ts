@@ -18,7 +18,6 @@ loginHandler.use(session).post(async function (req, res) {
     if (!user) {
       res.status(403).json({ msg: "Login Error, username/password incorrect" });
     }
-    //implement bcrypt compare method here
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
       const userWithoutPassword = pick(user, ["name", "email", "id"]);

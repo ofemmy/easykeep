@@ -1,6 +1,9 @@
 -- CreateEnum
 CREATE TYPE "TransactionType" AS ENUM ('Income', 'Expense');
 
+-- CreateEnum
+CREATE TYPE "TrxFrequency" AS ENUM ('Once', 'Recurring');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
@@ -26,13 +29,13 @@ CREATE TABLE "Transaction" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "amount" DECIMAL(65,30) NOT NULL,
-    "isRecurring" BOOLEAN NOT NULL DEFAULT false,
-    "date" TIMESTAMP(3) NOT NULL,
-    "month" INTEGER NOT NULL,
-    "year" INTEGER NOT NULL,
+    "frequency" "TrxFrequency" NOT NULL,
+    "entry_date" DATE NOT NULL,
     "type" "TransactionType" NOT NULL,
     "category" TEXT NOT NULL,
-    "ownerId" INTEGER NOT NULL,
+    "owner_id" INTEGER NOT NULL,
+    "recurring_from" DATE,
+    "recurring_to" DATE,
 
     PRIMARY KEY ("id")
 );
@@ -47,4 +50,4 @@ CREATE UNIQUE INDEX "UserSetting_userId_unique" ON "UserSetting"("userId");
 ALTER TABLE "UserSetting" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Transaction" ADD FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Transaction" ADD FOREIGN KEY ("owner_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

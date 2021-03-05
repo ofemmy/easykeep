@@ -24,7 +24,7 @@ export const Months = [
 const AppMainLinks = {
   home: { href: "/", name: "Home", icon: <HomeSVG customClasses="mr-4" /> },
   new: {
-    href: "/new",
+    href: "/new2?type=once",
     name: "New",
     icon: <AddSVG customClasses="mr-4" />,
   },

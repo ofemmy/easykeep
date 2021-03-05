@@ -5,7 +5,7 @@ import withSession from "../lib/withSession";
 import { MyAppContext } from "../store";
 import { format } from "date-fns";
 import { Skeleton, Stack } from "@chakra-ui/react";
-import { fetchTransactions, fetchTransactionsWithPrisma } from "../db/queries/fetchTransactions";
+import { fetchTransactions, fetchTransactionsWithPrisma } from "../db/queries/fetchTransactionsOld";
 import { QueryClient, useQuery } from "react-query";
 import useDeleteTransaction from "../lib/useDeleteTransaction";
 import axios from "axios";

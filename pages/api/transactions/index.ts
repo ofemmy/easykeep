@@ -4,12 +4,13 @@ import { ExtendedRequest } from "../../../types/ExtendedApiRequest";
 import nc from "next-connect";
 import { authMiddleWare } from "../../../middleware/auth";
 import { connectToDatabase } from "../../../db";
-import { Transaction } from "../../../db/models/TransactionModel";
-import {
-  fetchTransactions,
-  fetchTransactionsWithPrisma,
-} from "../../../db/queries/fetchTransactions";
-
+import prisma from "../../../db/prisma";
+import { Transaction as Tr2 } from "../../../db/models/TransactionModel";
+import fetchTransactions from "../../../db/queries/fetchTransactions";
+import { getDateFromQuery } from "../../../lib/useDate";
+import { Transaction, TrxFrequency } from "@prisma/client";
+import fetchSum from "../../../db/queries/fetchSum";
+import { startOfMonth, addMonths, parseISO } from "date-fns";
 const handler = nc<ExtendedRequest, ExtendedResponse>({
   onNoMatch(req, res) {
     res.status(405).json({
@@ -22,26 +23,46 @@ handler
   .use(authMiddleWare)
   .get(async (req, res) => {
     const month = +req.query.month;
-    const limit = +req.query.limit;
-    const skip = +req.query.skip;
-
+    const limit = 5;
+    const currentMonth = getDateFromQuery(
+      new Date().getFullYear(),
+      Number(month)
+    );
+    console.log({ currentMonth });
+    const ownerId = req.user.id;
     try {
-      const {transactions, summary, totalResults} = await fetchTransactionsWithPrisma({
-        ownerId: req.user.id,
-        skip,
-        limit,
-        month,
+      const recentTransactions = await fetchTransactions({
+        ownerId: 1,
+        numToTake: limit,
+        currentMonth,
       });
+      const transactionSum = {}; //await fetchSum(ownerId, currentMonth);
       res.status(200).json({
         msg: "success",
         data: {
-          transactions,
-          summary,
-          totalResults
+          transactions: recentTransactions,
+          summary: transactionSum,
         },
       });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ msg: "server error", data: null });
+    }
+  })
+  .post(async (req, res) => {
+    console.log("hi");
+    const newPost: Transaction = req.body;
+    newPost.ownerId = req.user.id;
+    //TODO: Serverside validation
+    try {
+      if (newPost) {
+        const newTrx = await prisma.transaction.create({ data: newPost });
+        console.log(newTrx);
+        res.status(201).json({ status: "success", data: newTrx });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ status: "error", msg: "error occured on server" });
     }
   })
   // .post(async (req, res) => {

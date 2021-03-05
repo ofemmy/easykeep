@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import usePagination from "../lib/usePagination";
 import { MyAppContext } from "../store/index";
 import axios from "axios";
-import { fetchTransactions } from "../db/queries/fetchTransactions";
+import { fetchTransactions } from "../db/queries/fetchTransactionsOld";
 import Header from "../components/Header";
 import Navbar from "../components/Navbar";
 import withSession from "../lib/withSession";

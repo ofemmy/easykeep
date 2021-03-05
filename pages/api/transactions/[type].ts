@@ -2,8 +2,11 @@ import { ExtendedResponse } from "../../../types/ExtendedApiResponse";
 import { ExtendedRequest } from "../../../types/ExtendedApiRequest";
 import nc from "next-connect";
 import { authMiddleWare } from "../../../middleware/auth";
-import { fetchTransactions } from "../../../db/queries/fetchTransactions";
-import getTransactionType from "../../../lib/getTransactionType";
+import {
+  fetchTransactions,
+  fetchTransactionsWithPrisma,
+} from "../../../db/queries/fetchTransactionsOld";
+import getTransactionTypeEnum from "../../../lib/getTransactionType";
 import getQueryFilter from "../../../db/lib/QueryFilter";
 import getQueryOptions from "../../../db/lib/QueryOptions";
 import fetchRecurringTransactionSum from "../../../db/queries/fetchRecurringTransactionSum";
@@ -21,25 +24,25 @@ handler.use(authMiddleWare).get(async (req, res) => {
   const limit = +req.query.limit;
   const skip = +req.query.skip;
 
-  let transactionType = getTransactionType(type);
-  const filter = getQueryFilter(
-    { userID: req.user._id, month },
-    {},
-    {
-      type: transactionType,
-    }
-  );
-  const options = getQueryOptions({ skip, limit });
+  let transactionType = getTransactionTypeEnum(type);
+
   try {
-    const { transactions, summary, totalResults } = await fetchTransactions({
-      filter,
-      queryOptions: options,
+    const {
+      transactions,
+      summary,
+      totalResults,
+    } = await fetchTransactionsWithPrisma({
+      type: getTransactionTypeEnum(type),
+      month,
+      limit,
+      skip,
+      ownerId: req.user.id,
     });
     const result = await fetchRecurringTransactionSum({
       trxType: transactionType,
-      userID: req.user._id,
+      ownerId: req.user.id,
     });
-    summary.totalRecurring=result;
+    console.log(result);
     res.status(200).json({
       msg: "success",
       data: { transactions, summary, totalResults },

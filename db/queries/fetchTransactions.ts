@@ -1,96 +1,58 @@
-import { model } from "mongoose";
-import { connectToDatabase } from "..";
-import { ITransaction, ITransactionModel } from "../types/ITransaction";
-import QueryOption from "../../types/QueryOption";
+import { TrxFrequency } from "@prisma/client";
+import { addMonths, startOfMonth, endOfMonth } from "date-fns";
+import { Transaction } from "../models/TransactionModel";
 import prisma from "../prisma";
-import { TransactionType } from "@prisma/client";
-import { Decimal } from "@prisma/client/runtime";
-type Result = {
-  transactions: ITransaction[];
-  summary: {
-    totalIncome?: number;
-    totalExpense?: number;
-    totalRecurring?: number;
-  };
-  totalResults: number;
-};
-export const fetchTransactions = async (
-  options: QueryOption
-): Promise<Result> => {
-  let totals;
-  const { TransactionModel } = await connectToDatabase();
-  const {
-    filter,
-    exclude = ["-__v"],
-    queryOptions,
-    withAggregate = true,
-  } = options;
-  try {
-    const transactions = await TransactionModel.find(
-      filter,
-      exclude,
-      queryOptions
-    ).lean();
-    const totalNumOfDocs = await TransactionModel.countDocuments(filter);
 
-    if (withAggregate) {
-      totals = await TransactionModel.aggregate([
-        { $match: filter },
-        { $group: { _id: "$type", total: { $sum: "$amount" } } },
-      ]);
-    }
-    return {
-      transactions,
-      summary: parseSummary(totals),
-      totalResults: totalNumOfDocs,
-    };
-  } catch (error) {
-    return error;
-  }
-};
-function parseSummary(
-  summObj: { type: TransactionType; sum: { amount: Decimal } }[] = []
-) {
-  const result = { totalIncome: 0.0, totalExpense: 0.0 };
-  if (summObj.length == 0) {
-    return result;
-  }
-  summObj.forEach((obj) => {
-    if (obj.type === TransactionType.Expense) {
-      result.totalExpense = Number(obj.sum.amount);
-    } else {
-      result.totalIncome = Number(obj.sum.amount);
-    }
-  });
-  return result;
-}
-export const fetchTransactionsWithPrisma = async function (options: {
-  skip: number;
-  limit: number;
+export default async function fetchTransactions(options: {
   ownerId: number;
-  month: number;
+  currentMonth: Date;
+  numToTake: number;
 }) {
-  try {
-    if (!options.month) {
-      throw new Error("Please put in valid month and user id");
-    }
-    const filter = { month: options.month, ownerId: options.ownerId };
-    const transactions = await prisma.transaction.findMany({
-      where: filter,
-      skip: options.skip,
-      take: options.limit,
-      orderBy: { date: "desc" },
-    });
-    const summary = await prisma.transaction.groupBy({
-      by: ["type"],
-      where: { month: options.month },
-      sum: { amount: true },
-    });
-    const totalResults = await prisma.transaction.count({
-      where: filter,
-    });
-    return { transactions, summary: parseSummary(summary), totalResults };
-  } catch (error) {
-    console.log(error);
-  }
-};
+  const { ownerId, currentMonth, numToTake } = options;
+  // const transactions = await prisma.transaction.findMany({
+  //   where: {
+  //     OR: [
+  //       {
+  //         AND: [
+  //           { frequency: TrxFrequency.OneTime },
+  //           { entryDate: { gte: currentMonth } },
+  //           { entryDate: { lt: addMonths(currentMonth, 1) } },
+  //         ],
+  //       },
+  //       {
+  //         AND: [
+  //           { frequency: TrxFrequency.Recurring },
+  //           { recurrenceDuration:{gte:entryDate+1} },
+
+  //         ],
+  //       },
+  //     ],
+  //     AND: { ownerId },
+  //   },
+  //   //take: numToTake,
+  //   orderBy: { id: "asc" },
+  // });
+  let month2 = 4;
+  let query = `SELECT * FROM "Transaction" WHERE "entry_date" BETWEEN date '2021-03-01' AND date '2021-03-01' + INTERVAL '${month2} Month' ORDER BY id ASC;`;
+  //const trans2 = await prisma.$queryRaw`SELECT * FROM "Transaction" WHERE EXTRACT(MONTH FROM "isRecurringFrom") = 3;`;
+  // const result = await prisma.$queryRaw`SELECT amount FROM "Transaction" WHERE entry  NOT BETWEEN ${start} and ${end} ORDER BY id ASC;`;
+  //const result = await prisma.$queryRaw`SELECT * FROM "User" WHERE id = ${userId};`;
+  // let test = await prisma.$queryRaw(
+  //   "SELECT date_part('hour', timestamp '2002-09-17 19:27:45');"
+  // );
+  let month = 1;
+  // let transactions = await prisma.$queryRaw`SELECT * FROM "Transaction" WHERE "entry_date" BETWEEN date '2021-03-01' AND date '2021-03-01' + INTERVAL '${month2} Month' ORDER BY id ASC;`;
+  let id = 3;
+  const test = await prisma.$queryRaw`SELECT * FROM "Transaction" WHERE DATE_PART('month',"entry_date") = 3`;
+
+  //trans2.forEach((t) => console.log(t.amount));
+  return test;
+}
+
+// where: {
+//   AND: [
+//     { ownerId },
+//     { entryDate: { gte: currentMonth } },
+//     { entryDate: { lt: addMonths(currentMonth, 1) } },
+//   ],
+// },

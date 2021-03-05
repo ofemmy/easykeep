@@ -23,7 +23,7 @@
     "typings.d.ts",
     "**/*.ts",
     "**/*.tsx"
-, "db/index.ts"  ],
+, "db/index.ts", "pages/new3"  ],
   "exclude": [
     "node_modules"
   ]
