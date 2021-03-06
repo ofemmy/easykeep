@@ -6,11 +6,10 @@ import { authMiddleWare } from "../../../middleware/auth";
 import { connectToDatabase } from "../../../db";
 import prisma from "../../../db/prisma";
 import { Transaction as Tr2 } from "../../../db/models/TransactionModel";
-import fetchTransactions from "../../../db/queries/fetchTransactions";
-import { getDateFromQuery } from "../../../lib/useDate";
-import { Transaction, TrxFrequency } from "@prisma/client";
-import fetchSum from "../../../db/queries/fetchSum";
+import { getDateFromQuery, getDateWithoutTimeZone } from "../../../lib/useDate";
+import { Transaction, Prisma } from "@prisma/client";
 import { startOfMonth, addMonths, parseISO } from "date-fns";
+import { fetchRecentTransactions, fetchSum } from "../../../db/queries";
 const handler = nc<ExtendedRequest, ExtendedResponse>({
   onNoMatch(req, res) {
     res.status(405).json({
@@ -23,20 +22,18 @@ handler
   .use(authMiddleWare)
   .get(async (req, res) => {
     const month = +req.query.month;
+    const year = +req.query.year || new Date().getFullYear();
     const limit = 5;
-    const currentMonth = getDateFromQuery(
-      new Date().getFullYear(),
-      Number(month)
-    );
-    console.log({ currentMonth });
+    const currentMonth = getDateFromQuery(year, Number(month));
+    console.log({ currentMonth }, getDateWithoutTimeZone(new Date()));
     const ownerId = req.user.id;
     try {
-      const recentTransactions = await fetchTransactions({
-        ownerId: 1,
-        numToTake: limit,
-        currentMonth,
+      const recentTransactions = await fetchRecentTransactions({
+        howMany: limit,
+        ownerId,
+        date: getDateWithoutTimeZone(new Date()),
       });
-      const transactionSum = {}; //await fetchSum(ownerId, currentMonth);
+      const transactionSum = await fetchSum({ ownerId, date: currentMonth });
       res.status(200).json({
         msg: "success",
         data: {

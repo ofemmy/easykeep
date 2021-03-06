@@ -32,13 +32,13 @@ model Transaction {
   title         String
   amount        Decimal
   frequency     TrxFrequency
-  entryDate     DateTime        @map("entry_date") @db.Date
+  entryDate     DateTime        @db.Date
   type          TransactionType
   category      String
   owner         User            @relation(fields: [ownerId], references: [id])
-  ownerId       Int             @map("owner_id")
-  recurringFrom DateTime?       @map("recurring_from") @db.Date
-  recurringTo   DateTime?       @map("recurring_to") @db.Date
+  ownerId       Int
+  recurringFrom DateTime?       @db.Date
+  recurringTo   DateTime?       @db.Date
 }
 
 enum TransactionType {

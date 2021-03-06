@@ -9,7 +9,7 @@ import { useMutation } from "react-query";
 import { useToast } from "@chakra-ui/react";
 import useFormConfig from "../../lib/useFormConfig";
 
-const New2 = ({ user }) => {
+const RecurringEntry = ({ user }) => {
   const {
     setUser,
     month,
@@ -76,7 +76,7 @@ const New2 = ({ user }) => {
                     type="button"
                     className="inline-flex items-center px-1.5 py-1 border border-transparent text-xs rounded text-gray-700 bg-gray-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-semibold"
                     onClick={() => {
-                      router.push("/new3");
+                      router.push("/new");
                     }}
                   >
                     Click here to add non-recurring transaction
@@ -105,7 +105,7 @@ const New2 = ({ user }) => {
   );
 };
 
-export default New2;
+export default RecurringEntry;
 
 export const getServerSideProps = withSession(async function ({ req, res }) {
   const user = req.session.get("user");

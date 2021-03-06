@@ -5,7 +5,10 @@ import withSession from "../lib/withSession";
 import { MyAppContext } from "../store";
 import { format } from "date-fns";
 import { Skeleton, Stack } from "@chakra-ui/react";
-import { fetchTransactions, fetchTransactionsWithPrisma } from "../db/queries/fetchTransactionsOld";
+import {
+  fetchTransactions,
+  fetchTransactionsWithPrisma,
+} from "../db/queries/fetchTransactionsOld";
 import { QueryClient, useQuery } from "react-query";
 import useDeleteTransaction from "../lib/useDeleteTransaction";
 import axios from "axios";
@@ -14,7 +17,8 @@ import useWindowWidth from "../lib/useWindowWidth";
 import TitleComponent from "../components/TitleComponent";
 import AmountComponent from "../components/AmountComponent";
 import CategoryComponent from "../components/CategoryComponent";
-
+import { fetchRecentTransactions, fetchSum } from "../db/queries";
+import { getDateFromQuery } from "../lib/useDate";
 
 const DataTableBig = dynamic(() => import("../components/DataTableBig"));
 const DataTableSmall = dynamic(() => import("../components/DataTableSmall"));
@@ -33,7 +37,7 @@ export const columns = [
   },
   {
     Header: "Date",
-    accessor: (row) => format(new Date(row.date), "MM/dd/yyyy"),
+    accessor: (row) => format(new Date(row.entryDate), "MM/dd/yyyy"), // TODO:date
   },
   {
     Header: "Category",
@@ -94,6 +98,7 @@ export default function Home({ user, pageData }) {
           pageCount={pageCount}
           limit={limit}
           skip={skip}
+          showNav={false}
         />
       ) : (
         <DataTableSmall
@@ -117,11 +122,21 @@ export const getServerSideProps = withSession(async function ({ req, res }) {
       },
     };
   }
- 
-  const requestOptions = {limit:5,skip:0,ownerId:user.id,month:new Date().getMonth()}
-  const data = await fetchTransactionsWithPrisma(requestOptions);
-  const result = { msg: "success", data: JSON.parse(JSON.stringify(data)) };
+  const today = new Date();
+  const current_month = getDateFromQuery(today.getFullYear(), today.getMonth());
+  const requestOptions = {
+    howMany: 5,
+    ownerId: user.id,
+    date: current_month,
+  };
+  const trxList = await fetchRecentTransactions(requestOptions);
+  const summary = await fetchSum({ ownerId: user.id, date: current_month });
+
+  const result = {
+    msg: "success",
+    data: { transactions: trxList, summary },
+  };
   return {
-    props: { user, pageData: result }, //went JSON crazy because Next JS is having problems with _id and date fields
+    props: { user, pageData: result },
   };
 });

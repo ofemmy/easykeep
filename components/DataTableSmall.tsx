@@ -5,7 +5,7 @@ import CashSVG from "./svgs/CashSVG";
 import { CategoryIcon } from "./CategoryIcon";
 import ChevRightSVG from "./svgs/ChevRightSVG";
 import formatNumberToCurrency from "../lib/formatCurrency";
-import TransactionType from "../types/TransactionType";
+import { TransactionType } from "@prisma/client";
 import Currency from "../types/Currency";
 import { de } from "date-fns/locale";
 import { format } from "date-fns";
@@ -36,27 +36,30 @@ const DataTableSmall: React.FC<DataTableProps & { isDetailPage: boolean }> = ({
         <div className="sm:hidden px-4">
           <ul className="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
             {transactions.map((trx) => (
-              <li key={trx._id}
-              >
+              <li key={trx.id}>
                 <Link href={`/transactions/${trx.type.toLowerCase()}`}>
                   <a className="block px-4 py-4 bg-white hover:bg-gray-50">
                     <span className="flex items-center space-x-4">
                       <span className="flex-1 flex space-x-4 truncate">
-                        <CashSVG customClasses="text-gray-500"/>
+                        <CashSVG customClasses="text-gray-500" />
                         <span className="flex flex-col text-gray-500 text-sm truncate">
                           <span className="truncate">{trx.title}</span>
                           <span
                             className={`${
-                              trx.type == TransactionType.INCOME
+                              trx.type == TransactionType.Income
                                 ? "text-green-500"
                                 : "text-red-500"
                             } font-medium`}
                           >
-                            {trx.type == TransactionType.INCOME ? "+" : "-"}
-                            {formatNumberToCurrency(trx.amount, currency)}
+                            {trx.type == TransactionType.Income ? "+" : "-"}
+                            {formatNumberToCurrency(
+                              (trx.amount as never) as number,
+                              currency
+                            )}
                           </span>
                           <span>
-                            {format(new Date(trx.date), "do LLL yyyy", {
+                            {/* todo use correct date */}
+                            {format(new Date(trx.entryDate), "do LLL yyyy", {
                               locale: de,
                             })}
                           </span>
@@ -64,13 +67,15 @@ const DataTableSmall: React.FC<DataTableProps & { isDetailPage: boolean }> = ({
                       </span>
                       {isDetailPage ? (
                         <div className="space-x-2 px-2 py-4 flex items-center justify-center">
-                         <button className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
-                          <EditSVG/>
-                         </button>
-                          <button 
-                          onClick={()=>mutation.mutate(trx._id as any)}
-                          className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                            <DeleteSVG/>                          </button>
+                          <button className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                            <EditSVG />
+                          </button>
+                          <button
+                            onClick={() => mutation.mutate(trx.id as any)}
+                            className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                          >
+                            <DeleteSVG />{" "}
+                          </button>
                         </div>
                       ) : (
                         <button className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-gray-300 hover:bg-gray-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">

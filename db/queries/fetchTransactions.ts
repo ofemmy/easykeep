@@ -1,5 +1,6 @@
 import { TrxFrequency } from "@prisma/client";
 import { addMonths, startOfMonth, endOfMonth } from "date-fns";
+import { getDateWithoutTimeZone } from "../../lib/useDate";
 import { Transaction } from "../models/TransactionModel";
 import prisma from "../prisma";
 
@@ -42,9 +43,12 @@ export default async function fetchTransactions(options: {
   // );
   let month = 1;
   // let transactions = await prisma.$queryRaw`SELECT * FROM "Transaction" WHERE "entry_date" BETWEEN date '2021-03-01' AND date '2021-03-01' + INTERVAL '${month2} Month' ORDER BY id ASC;`;
-  let id = 3;
-  const test = await prisma.$queryRaw`SELECT * FROM "Transaction" WHERE DATE_PART('month',"entry_date") = 3`;
-
+  //SELECT * FROM "Transaction" WHERE ('frequency'="Once" AND DATE_TRUNC('month',${d}::date,'gmt')=DATE_TRUNC('month',entry_date))
+  let d = new Date();
+  let rec = TrxFrequency.Recurring;
+  let once = TrxFrequency.Once;
+  const test = await prisma.$queryRaw`SELECT * from "Transaction" WHERE ((frequency=${once} AND DATE_TRUNC('month',entry_date,'utc')=DATE_TRUNC('month',${d}::date,'utc')) OR (frequency=${rec} AND (date_trunc('month',${d}::date,'utc') BETWEEN date_trunc('month',recurring_from,'utc') AND date_trunc('month',recurring_to,'utc')))) ORDER BY entry_date DESC`;
+  console.log(test);
   //trans2.forEach((t) => console.log(t.amount));
   return test;
 }

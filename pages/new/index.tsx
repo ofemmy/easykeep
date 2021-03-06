@@ -9,7 +9,7 @@ import { useMutation } from "react-query";
 import { useToast } from "@chakra-ui/react";
 import useFormConfig from "../../lib/useFormConfig";
 
-const New2 = ({ user }) => {
+const NonRecurringEntry = ({ user }) => {
   const {
     setUser,
     month,
@@ -106,7 +106,7 @@ const New2 = ({ user }) => {
   );
 };
 
-export default New2;
+export default NonRecurringEntry;
 
 export const getServerSideProps = withSession(async function ({ req, res }) {
   const user = req.session.get("user");
