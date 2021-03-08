@@ -8,8 +8,9 @@ import prisma from "../../../db/prisma";
 import { Transaction as Tr2 } from "../../../db/models/TransactionModel";
 import { getDateFromQuery, getDateWithoutTimeZone } from "../../../lib/useDate";
 import { Transaction, Prisma } from "@prisma/client";
-import { startOfMonth, addMonths, parseISO } from "date-fns";
-import { fetchRecentTransactions, fetchSum } from "../../../db/queries";
+import { startOfMonth, addMonths, addDays, isFirstDayOfMonth } from "date-fns";
+import { fetchTransactions,fetchSum } from "../../../db/queries";
+import { DateTime } from "luxon";
 const handler = nc<ExtendedRequest, ExtendedResponse>({
   onNoMatch(req, res) {
     res.status(405).json({
@@ -22,22 +23,27 @@ handler
   .use(authMiddleWare)
   .get(async (req, res) => {
     const month = +req.query.month;
-    const year = +req.query.year || new Date().getFullYear();
+    const year = +req.query.year;
+    let date = DateTime.utc();
     const limit = 5;
-    const currentMonth = getDateFromQuery(year, Number(month));
-    console.log({ currentMonth }, getDateWithoutTimeZone(new Date()));
+    if (month) {
+      date = date.set({ month });
+    }
+    if (year) {
+      date = date.set({ year });
+    }
     const ownerId = req.user.id;
     try {
-      const recentTransactions = await fetchRecentTransactions({
-        howMany: limit,
+      const data = await fetchTransactions({
+        date,
         ownerId,
-        date: getDateWithoutTimeZone(new Date()),
+        limit,
       });
-      const transactionSum = await fetchSum({ ownerId, date: currentMonth });
+      const transactionSum = await fetchSum({ ownerId, date });
       res.status(200).json({
         msg: "success",
         data: {
-          transactions: recentTransactions,
+          transactions: data,
           summary: transactionSum,
         },
       });
@@ -47,14 +53,13 @@ handler
     }
   })
   .post(async (req, res) => {
-    console.log("hi");
     const newPost: Transaction = req.body;
     newPost.ownerId = req.user.id;
+
     //TODO: Serverside validation
     try {
       if (newPost) {
         const newTrx = await prisma.transaction.create({ data: newPost });
-        console.log(newTrx);
         res.status(201).json({ status: "success", data: newTrx });
       }
     } catch (error) {
@@ -62,27 +67,6 @@ handler
       res.status(500).json({ status: "error", msg: "error occured on server" });
     }
   })
-  // .post(async (req, res) => {
-  //   const { title, amount, isRecurring, category, date, type } = req.body;
-  //   try {
-  //     const { TransactionModel } = await connectToDatabase();
-  //     const ObjectId = mongoose.Types.ObjectId;
-  //     const newTrx = await TransactionModel.create(
-  //       new Transaction(
-  //         title,
-  //         amount,
-  //         isRecurring,
-  //         new Date(date),
-  //         type,
-  //         category,
-  //         req.user._id
-  //       )
-  //     );
-  //     res.status(201).json({ msg: "success", data: newTrx.toObject() });
-  //   } catch (error) {
-  //     res.status(500).json({ msg: "Server error" });
-  //   }
-  // })
   .put(async (req, res) => {
     const { title, amount, isRecurring, category, date, type, _id } = req.body;
     try {

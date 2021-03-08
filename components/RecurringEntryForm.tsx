@@ -158,7 +158,7 @@ const RecurringEntryForm = ({
                 errors.entryDate ? "border-red-600" : "border-gray-300"
               } focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 pr-12 sm:text-sm  rounded-sm`}
               onClick={toggleCalendar}
-              value={values.entryDate.toLocaleDateString()}
+              value={values.entryDate.toISODate()}
               onChange={handleChange}
             />
             <div
@@ -206,7 +206,7 @@ const RecurringEntryForm = ({
                 errors.recurringFrom ? "border-red-600" : "border-gray-300"
               } focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 pr-12 sm:text-sm  rounded-sm`}
               onClick={toggleCalendarFrom}
-              value={values.recurringFrom.toLocaleDateString()}
+              value={values.recurringFrom.toISODate()}
               onChange={handleChange}
             />
             <div
@@ -269,7 +269,7 @@ const RecurringEntryForm = ({
                 errors.recurringTo ? "border-red-600" : "border-gray-300"
               } focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 pr-12 sm:text-sm  rounded-sm`}
               onClick={toggleCalendarTo}
-              value={values.recurringTo.toLocaleDateString()}
+              value={values.recurringTo.toISODate()}
               onChange={handleChange}
             />
             <div
@@ -288,7 +288,7 @@ const RecurringEntryForm = ({
               onClick={() =>
                 setFieldValue(
                   "recurringTo",
-                  getDateWithoutTimeZone(addMonths(values.recurringFrom, 6))
+                  values.recurringFrom.plus({ months: 6 })
                 )
               }
             >
@@ -300,7 +300,7 @@ const RecurringEntryForm = ({
               onClick={() =>
                 setFieldValue(
                   "recurringTo",
-                  getDateWithoutTimeZone(addMonths(values.recurringFrom, 12))
+                  values.recurringFrom.plus({ months: 12 })
                 )
               }
             >

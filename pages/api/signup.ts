@@ -5,6 +5,7 @@ import nextConnect from "next-connect";
 import bcrypt from "bcryptjs";
 import { session } from "../../middleware/auth";
 import prisma from "../../db/prisma";
+import { createUser, findUserByEmail } from "../../db/queries";
 
 const signupHandler = nextConnect<ExtendedRequest, ExtendedResponse>();
 //only using the session middleware here so I can write user to session after successful signup
@@ -12,9 +13,7 @@ signupHandler.use(session).post(async function (req, res) {
   const { email, password, name } = req.body;
 
   try {
-    const user = await prisma.user.findFirst({
-      where: { email },
-    });
+    const user = await prisma.user.findFirst({ where: { email } });
     if (user) {
       return res
         .status(400)
@@ -27,8 +26,8 @@ signupHandler.use(session).post(async function (req, res) {
     }
     const hashedPassword = await bcrypt.hash(password, 8);
     const newUser = await prisma.user.create({
-      data: { email, password: hashedPassword, name },
-      select: { email: true, name: true, id: true },
+      data: { email, name, password: hashedPassword },
+      select: { email: true, id: true, name: true },
     });
     if (newUser) {
       req.session.set<User>("user", newUser);

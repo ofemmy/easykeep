@@ -4,7 +4,9 @@ import NormalEntryForm from "../components/NormalEntryForm";
 import RecurringEntryForm from "../components/RecurringEntryForm";
 import { addMonths } from "date-fns";
 import { getDateWithoutTimeZone } from "./useDate";
+import { DateTime } from "luxon";
 export default function useFormConfig(formType: TrxFrequency) {
+  const today = DateTime.utc();
   const schema = useFormSchema(formType);
   let formComponent, initialValues;
   if (formType == TrxFrequency.Once) {
@@ -14,7 +16,7 @@ export default function useFormConfig(formType: TrxFrequency) {
       type: "" as TransactionType,
       amount: "",
       frequency: TrxFrequency.Once,
-      entryDate: getDateWithoutTimeZone(new Date()),
+      entryDate: today,
       category: "",
     };
   } else {
@@ -24,10 +26,10 @@ export default function useFormConfig(formType: TrxFrequency) {
       type: "" as TransactionType,
       amount: "",
       frequency: TrxFrequency.Recurring,
-      entryDate: getDateWithoutTimeZone(new Date()),
+      entryDate: today,
       category: "",
-      recurringFrom: getDateWithoutTimeZone(new Date()),
-      recurringTo: getDateWithoutTimeZone(addMonths(new Date(), 12)),
+      recurringFrom: today,
+      recurringTo: today.plus({ months: 12 }),
     };
   }
   return { schema, formComponent, initialValues };

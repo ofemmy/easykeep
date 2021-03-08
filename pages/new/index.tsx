@@ -92,7 +92,6 @@ const NonRecurringEntry = ({ user }) => {
                 initialValues={initialValues}
                 validationSchema={schema}
                 onSubmit={(values, actions) => {
-                  console.log(values);
                   mutation.mutate(values);
                   actions.resetForm({});
                 }}

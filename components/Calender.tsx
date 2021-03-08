@@ -11,6 +11,7 @@ import {
   isSameMonth,
   format,
 } from "date-fns";
+import { DateTime } from "luxon";
 import { getDateWithoutTimeZone } from "../lib/useDate";
 const range = (start: number, stop: number, step: number = 1) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
@@ -18,7 +19,7 @@ interface OCalenderProps {
   CustomComponent?: React.FC<{}>;
   clickHandler: Function;
   toggleCalendar?: Function;
-  date?: Date;
+  date?: DateTime;
   field: string;
 }
 const OCalender: React.FC<OCalenderProps> = ({
@@ -27,31 +28,35 @@ const OCalender: React.FC<OCalenderProps> = ({
   date,
   field,
 }) => {
-  const [calDate, setDate] = useState(date || new Date());
+  const [calDate, setCalDate] = useState(date || DateTime.utc());
   const getFirstDay = (i: number) => {
     if (i === 1) {
-      const firstDay = startOfMonth(calDate);
-      return getDay(firstDay) + 1;
+      const firstDay = calDate.startOf("month");
+      return firstDay.get("day") + 1;
     }
   };
-  const days = range(1, getDaysInMonth(calDate));
+  const days = range(1, calDate.daysInMonth);
   const goNextMonth = () => {
-    setDate(addMonths(calDate, 1));
+    let newMonth = calDate.plus({ month: 1 });
+    setCalDate(newMonth);
   };
   const goPrevMonth = () => {
-    setDate(addMonths(calDate, -1));
+    let newMonth = calDate.plus({ month: -1 });
+    setCalDate(newMonth);
   };
-  const getCurrentMonth = () => getMonth(calDate);
-  const getCurrentYear = () => getYear(calDate);
-  const setNewDate = (day) => {
-    setDate(new Date(getYear(date), getMonth(calDate), day));
+  const getCurrentMonth = () => calDate.get("month");
+  const getCurrentYear = () => calDate.get("year");
+  const setNewDate = (day: number) => {
+    const newDate = calDate.set({
+      year: getCurrentYear(),
+      month: getCurrentMonth(),
+      day,
+    });
+    setCalDate(newDate);
     toggleCalendar();
-    let newDate = getDateWithoutTimeZone(
-      new Date(getYear(calDate), getMonth(calDate), day)
-    );
     clickHandler(field, newDate);
   };
-
+  const isSameMonth = ()=>calDate.hasSame(DateTime.utc(),'month');
   return (
     <CalenderWidget
       goNextMonth={goNextMonth}

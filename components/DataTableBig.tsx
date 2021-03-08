@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo,useContext } from "react";
+import React, { useEffect, useMemo, useContext } from "react";
 import Currency from "../types/Currency";
 import { ITransaction } from "../db/types/ITransaction";
 import { useTable, usePagination } from "react-table";
 import TableOptions from "./TableOptions";
-import {MyAppContext} from "../store"
+import { MyAppContext } from "../store";
 import Link from "next/link";
 import { Transaction } from "@prisma/client";
 export type DataTableProps = {
@@ -14,8 +14,8 @@ export type DataTableProps = {
   totalResults?: number;
   showNav?: boolean;
   columnData?: any;
-  setSkip?:any;
-  skip?:number
+  setSkip?: any;
+  skip?: number;
 };
 const DataTableBig: React.FC<DataTableProps> = ({
   transactions,
@@ -25,7 +25,7 @@ const DataTableBig: React.FC<DataTableProps> = ({
   totalResults,
   showNav = true,
   columnData,
-  pageCount:controlledPageCount
+  pageCount: controlledPageCount,
 }) => {
   const columns = useMemo(() => columnData, []);
   const {
@@ -44,16 +44,18 @@ const DataTableBig: React.FC<DataTableProps> = ({
     {
       columns,
       data: transactions,
-      initialState:{pageSize:limit,hiddenColumns:["type"]},
+      initialState: { pageSize: limit, hiddenColumns: ["type"] },
       pageCount: controlledPageCount,
       manualPagination: true,
     },
     usePagination
   );
-  const {month} = useContext(MyAppContext)
-  useEffect(()=>{
-  setSkip((pageIndex)*pageSize)
-},[pageIndex])
+  const { month } = useContext(MyAppContext);
+  useEffect(() => {
+    if (setSkip) {
+      setSkip(pageIndex * pageSize);
+    }
+  }, [pageIndex]);
   return (
     <div className="">
       <div className="max-w-6xl mx-auto px-4">
@@ -77,8 +79,8 @@ const DataTableBig: React.FC<DataTableProps> = ({
                         </th>
                       ))}
                       <th scope="col" className="relative px-6 py-3">
-                <span className="sr-only">Edit</span>
-              </th>
+                        <span className="sr-only">Edit</span>
+                      </th>
                     </tr>
                   ))}
                 </thead>
@@ -89,20 +91,23 @@ const DataTableBig: React.FC<DataTableProps> = ({
                   {page.map((row, i) => {
                     prepareRow(row);
                     return (
-                      <tr {...row.getRowProps()} className="bg-white odd:bg-gray-100">
+                      <tr
+                        {...row.getRowProps()}
+                        className="bg-white odd:bg-gray-100"
+                      >
                         {row.cells.map((cell) => {
                           return (
-        
-                            <td {...cell.getCellProps()} className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
+                            <td
+                              {...cell.getCellProps()}
+                              className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500"
+                            >
                               {cell.render("Cell")}
                             </td>
-                            
-                          
                           );
                         })}
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <TableOptions trxObject={row.original}/>
-                          </td>
+                          <TableOptions trxObject={row.original} />
+                        </td>
                       </tr>
                     );
                   })}
@@ -119,11 +124,11 @@ const DataTableBig: React.FC<DataTableProps> = ({
                       Showing
                       <span className="font-medium px-1">
                         {/* (pageIndex+1)+limit */}
-                        {canPreviousPage?(skip+1):1}
+                        {canPreviousPage ? skip + 1 : 1}
                       </span>
                       to
                       <span className="font-medium px-1">
-                        {canNextPage?(skip+limit):totalResults}
+                        {canNextPage ? skip + limit : totalResults}
                       </span>
                       of
                       <span className="font-medium px-1">{totalResults}</span>
@@ -154,11 +159,14 @@ const DataTableBig: React.FC<DataTableProps> = ({
               <span>No transactions yet for {month.name}.</span>
               <span className="ml-5">
                 <Link href="/new">
-                <a href="" className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                Add your first Transaction
-                </a>
+                  <a
+                    href=""
+                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    Add your first Transaction
+                  </a>
                 </Link>
-                </span>
+              </span>
             </div>
           )}
         </div>

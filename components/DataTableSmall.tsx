@@ -7,8 +7,7 @@ import ChevRightSVG from "./svgs/ChevRightSVG";
 import formatNumberToCurrency from "../lib/formatCurrency";
 import { TransactionType } from "@prisma/client";
 import Currency from "../types/Currency";
-import { de } from "date-fns/locale";
-import { format } from "date-fns";
+import { DateTime } from "luxon";
 import { DataTableProps } from "./DataTableBig";
 import Link from "next/link";
 import useDeleteTransaction from "../lib/useDeleteTransaction";
@@ -59,9 +58,7 @@ const DataTableSmall: React.FC<DataTableProps & { isDetailPage: boolean }> = ({
                           </span>
                           <span>
                             {/* todo use correct date */}
-                            {format(new Date(trx.entryDate), "do LLL yyyy", {
-                              locale: de,
-                            })}
+                            {DateTime.fromJSDate(new Date(trx.entryDate)).toFormat('yyyy.LL.dd')}
                           </span>
                         </span>
                       </span>

@@ -158,7 +158,7 @@ const NormalEntryForm = ({
                 errors.entryDate ? "border-red-600" : "border-gray-300"
               } focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 pr-12 sm:text-sm  rounded-sm`}
               onClick={toggleCalendar}
-              value={values.entryDate.toLocaleDateString()}
+              value={values.entryDate.toISODate()}
               onChange={handleChange}
             />
             <div

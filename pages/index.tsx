@@ -1,24 +1,24 @@
 import dynamic from "next/dynamic";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import Header from "../components/Header";
 import withSession from "../lib/withSession";
 import { MyAppContext } from "../store";
 import { format } from "date-fns";
-import { Skeleton, Stack } from "@chakra-ui/react";
-import {
-  fetchTransactions,
-  fetchTransactionsWithPrisma,
-} from "../db/queries/fetchTransactionsOld";
-import { QueryClient, useQuery } from "react-query";
-import useDeleteTransaction from "../lib/useDeleteTransaction";
+import { Skeleton } from "@chakra-ui/react";
+import { useQuery } from "react-query";
 import axios from "axios";
 import Dashboard from "../components/Dashboard";
 import useWindowWidth from "../lib/useWindowWidth";
 import TitleComponent from "../components/TitleComponent";
 import AmountComponent from "../components/AmountComponent";
 import CategoryComponent from "../components/CategoryComponent";
-import { fetchRecentTransactions, fetchSum } from "../db/queries";
+import {
+  fetchRecentTransactions,
+  fetchSum,
+  fetchTransactions,
+} from "../db/queries";
 import { getDateFromQuery } from "../lib/useDate";
+import { DateTime } from "luxon";
 
 const DataTableBig = dynamic(() => import("../components/DataTableBig"));
 const DataTableSmall = dynamic(() => import("../components/DataTableSmall"));
@@ -37,7 +37,7 @@ export const columns = [
   },
   {
     Header: "Date",
-    accessor: (row) => format(new Date(row.entryDate), "MM/dd/yyyy"), // TODO:date
+    accessor: (row) => DateTime.fromISO(row.entryDate).toISODate(), // TODO:date
   },
   {
     Header: "Category",
@@ -47,9 +47,7 @@ export const columns = [
 ];
 const getTransactions = async (config) => {
   const { month, skip, limit } = config;
-  const res = await axios.get(
-    `/api/transactions?month=${month}&skip=${skip}&limit=${limit}`
-  );
+  const res = await axios.get(`/api/transactions?month=${month}`);
 
   return res.data;
 };
@@ -57,9 +55,6 @@ const getTransactions = async (config) => {
 export default function Home({ user, pageData }) {
   const screenWidthMatched = useWindowWidth("sm");
   const { setUser, month, setSidebarOpen } = useContext(MyAppContext);
-  const mutation = useDeleteTransaction();
-  const [limit, setLimit] = useState(5);
-  const [skip, setSkip] = useState(0);
   useEffect(() => {
     setUser(user);
   }, [user]);
@@ -67,12 +62,11 @@ export default function Home({ user, pageData }) {
     setSidebarOpen(false);
   }, []);
   const { data, isLoading, isError } = useQuery(
-    ["transactions", month, skip, limit],
-    () => getTransactions({ skip, limit, month: month.code }),
+    ["transactions", month],
+    () => getTransactions({ month: month.code }),
     { initialData: pageData, keepPreviousData: true }
   );
-  const { summary, transactions, totalResults } = data.data;
-  const pageCount = Math.ceil(totalResults / limit);
+  const { summary, transactions } = data.data;
   return (
     <>
       <Header pageTitle="Home" />
@@ -92,20 +86,11 @@ export default function Home({ user, pageData }) {
       {screenWidthMatched ? (
         <DataTableBig
           transactions={transactions}
-          totalResults={totalResults}
-          setSkip={setSkip}
           columnData={columns}
-          pageCount={pageCount}
-          limit={limit}
-          skip={skip}
           showNav={false}
         />
       ) : (
-        <DataTableSmall
-          transactions={transactions}
-          totalResults={totalResults}
-          isDetailPage={false}
-        />
+        <DataTableSmall transactions={transactions} isDetailPage={false} />
       )}
       <div className="mt-16"></div>
     </>
@@ -122,21 +107,21 @@ export const getServerSideProps = withSession(async function ({ req, res }) {
       },
     };
   }
-  const today = new Date();
-  const current_month = getDateFromQuery(today.getFullYear(), today.getMonth());
+  const today = DateTime.utc();
   const requestOptions = {
-    howMany: 5,
+    limit: 5,
     ownerId: user.id,
-    date: current_month,
+    date: today,
   };
-  const trxList = await fetchRecentTransactions(requestOptions);
-  const summary = await fetchSum({ ownerId: user.id, date: current_month });
+  const trxList = await fetchTransactions(requestOptions);
+  const summary = await fetchSum({ ownerId: user.id, date: today });
 
   const result = {
     msg: "success",
     data: { transactions: trxList, summary },
   };
+  const pageData = JSON.parse(JSON.stringify(result));
   return {
-    props: { user, pageData: result },
+    props: { user, pageData },
   };
 });

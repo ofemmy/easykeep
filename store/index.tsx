@@ -7,19 +7,20 @@ import CardSVG from "../components/svgs/CardSVG";
 import Currency from "../types/Currency";
 import DocumentSVG from "../components/svgs/DocumentSVG";
 import AddSVG from "../components/svgs/AddSVG";
+import { DateTime } from "luxon";
 export const Months = [
-  { code: 0, name: "January" },
-  { code: 1, name: "February" },
-  { code: 2, name: "March" },
-  { code: 3, name: "April" },
-  { code: 4, name: "May" },
-  { code: 5, name: "June" },
-  { code: 6, name: "July" },
-  { code: 7, name: "August" },
-  { code: 8, name: "September" },
-  { code: 9, name: "October" },
-  { code: 10, name: "November" },
-  { code: 11, name: "December" },
+  { code: 1, name: "January" },
+  { code: 2, name: "February" },
+  { code: 3, name: "March" },
+  { code: 4, name: "April" },
+  { code: 5, name: "May" },
+  { code: 6, name: "June" },
+  { code: 7, name: "July" },
+  { code: 8, name: "August" },
+  { code: 9, name: "September" },
+  { code: 10, name: "October" },
+  { code: 11, name: "November" },
+  { code: 12, name: "December" },
 ];
 const AppMainLinks = {
   home: { href: "/", name: "Home", icon: <HomeSVG customClasses="mr-4" /> },
@@ -37,7 +38,7 @@ const AppMainLinks = {
     href: "/transactions/expense",
     name: "Expenses",
     icon: <CardSVG customClasses="mr-4" />,
-  },  
+  },
 };
 type MyAppContextType = {
   month: { code: number; name: string };
@@ -56,7 +57,9 @@ type MyAppContextType = {
 export const MyAppContext = createContext<MyAppContextType>(null);
 
 export default function AppStore({ children }) {
-  const currentMonth = Months.find((m) => m.code == new Date().getMonth());
+  const currentMonth = Months.find(
+    (m) => m.code == DateTime.now().get("month")
+  );
   const [month, setMonth] = useState(currentMonth);
   const [user, setUser] = useState(null);
   const [currency, setCurrency] = useState(Currency.EUR);
@@ -77,7 +80,7 @@ export default function AppStore({ children }) {
         setSidebarOpen,
         isLoading,
         setisLoading,
-        AppMainLinks
+        AppMainLinks,
       }}
     >
       {children}

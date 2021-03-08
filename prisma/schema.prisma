@@ -1,52 +1,50 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["createMany", "groupBy"]
 }
 
-model User {
-  id           Int           @id @default(autoincrement())
-  email        String        @unique
-  name         String
-  password     String
-  UserSettings UserSetting?
-  Transaction  Transaction[]
-}
-
-model UserSetting {
-  id         Int      @id @default(autoincrement())
-  user       User     @relation(fields: [userId], references: [id])
-  userId     Int
-  currency   String
-  categories String[]
+///
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Transaction {
-  id            Int             @id @default(autoincrement())
+  id            Int                  @id @default(autoincrement())
   title         String
-  amount        Decimal
-  frequency     TrxFrequency
-  entryDate     DateTime        @db.Date
+  amount        Decimal              @db.Decimal
   type          TransactionType
+  frequency     TrxFrequency
+  entryDate     DateTime             
   category      String
-  owner         User            @relation(fields: [ownerId], references: [id])
-  ownerId       Int
-  recurringFrom DateTime?       @db.Date
-  recurringTo   DateTime?       @db.Date
+  recurringFrom DateTime?            
+  recurringTo   DateTime?            
+  ownerId       Int                  
+  users         User                 @relation(fields: [ownerId], references: [id])
+
+  @@map("transactions")
 }
 
-enum TransactionType {
-  Income
-  Expense
+model User {
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String
+  password     String
+  transactions Transaction[]
+
+  @@map("users")
 }
 
 enum TrxFrequency {
   Once
   Recurring
+
+  @@map("Trxfrequency")
+}
+
+enum TransactionType {
+  Income
+  Expense
+
+  @@map("trxtype")
 }
