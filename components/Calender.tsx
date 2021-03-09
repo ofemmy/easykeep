@@ -28,7 +28,8 @@ const OCalender: React.FC<OCalenderProps> = ({
   date,
   field,
 }) => {
-  const [calDate, setCalDate] = useState(date || DateTime.utc());
+  let today = DateTime.utc().set({ hour: 12, minute: 0, second: 0 });
+  const [calDate, setCalDate] = useState(date || today);
   const getFirstDay = (i: number) => {
     if (i === 1) {
       const firstDay = calDate.startOf("month");
@@ -51,12 +52,15 @@ const OCalender: React.FC<OCalenderProps> = ({
       year: getCurrentYear(),
       month: getCurrentMonth(),
       day,
+      hour: 12,
+      minute: 0,
+      second: 0,
     });
     setCalDate(newDate);
     toggleCalendar();
     clickHandler(field, newDate);
   };
-  const isSameMonth = ()=>calDate.hasSame(DateTime.utc(),'month');
+  const isSameMonth = () => calDate.hasSame(DateTime.utc(), "month");
   return (
     <CalenderWidget
       goNextMonth={goNextMonth}

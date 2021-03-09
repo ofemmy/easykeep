@@ -10,17 +10,17 @@ datasource db {
 }
 
 model Transaction {
-  id            Int                  @id @default(autoincrement())
+  id            Int             @id @default(autoincrement())
   title         String
-  amount        Decimal              @db.Decimal
+  amount        Decimal         @db.Decimal
   type          TransactionType
   frequency     TrxFrequency
-  entryDate     DateTime             
+  entryDate     DateTime        @db.Timestamptz
   category      String
-  recurringFrom DateTime?            
-  recurringTo   DateTime?            
-  ownerId       Int                  
-  users         User                 @relation(fields: [ownerId], references: [id])
+  recurringFrom DateTime?       @db.Timestamptz
+  recurringTo   DateTime?       @db.Timestamptz
+  ownerId       Int
+  users         User            @relation(fields: [ownerId], references: [id])
 
   @@map("transactions")
 }
