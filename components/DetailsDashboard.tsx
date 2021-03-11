@@ -2,7 +2,12 @@ import React, { useContext } from "react";
 import formatNumberToCurrency from "../lib/formatCurrency";
 import { MyAppContext } from "../store";
 
-const DetailsDashboard = ({ totalRecurring, totalValue, color, typeName }) => {
+const DetailsDashboard = ({
+  totalRecurring,
+  color,
+  typeName,
+  totalOnce,
+}) => {
   const { currency } = useContext(MyAppContext);
   return (
     <div className="pb-4 bg-gray-100 sm:pb-4">
@@ -13,29 +18,32 @@ const DetailsDashboard = ({ totalRecurring, totalValue, color, typeName }) => {
             <dl className="rounded-md bg-white shadow-lg sm:grid sm:grid-cols-3">
               <div className="flex flex-col border-b border-gray-100 p-2 sm:p-6 text-center sm:border-0 sm:border-r">
                 <dt className="order-2 mt-2 text-sm sm:text-lg leading-6 font-medium text-gray-500">
-                Total {typeName}
+                  Total {typeName}
                 </dt>
-                <dd className={`order-1 text-lg sm:text-2xl font-extrabold text-${color}-600`}>
-                {formatNumberToCurrency(totalValue, currency)}
+                <dd
+                  className={`order-1 text-lg sm:text-2xl font-extrabold text-${color}-600`}
+                >
+                  {formatNumberToCurrency(totalOnce + totalRecurring, currency)}
                 </dd>
               </div>
               <div className="flex flex-col border-t border-b border-gray-100 p-2 sm:p-6 text-center sm:border-0 sm:border-l sm:border-r">
                 <dt className="order-2 mt-2 text-sm sm:text-lg leading-6 font-medium text-gray-500">
-                Monthly {typeName}
+                  Monthly {typeName}
                 </dt>
-                <dd className={`order-1 text-lg sm:text-2xl font-extrabold text-${color}-600`}>
-                {formatNumberToCurrency(
-                Math.abs(totalValue - totalRecurring),
-                currency
-              )}
+                <dd
+                  className={`order-1 text-lg sm:text-2xl font-extrabold text-${color}-600`}
+                >
+                  {formatNumberToCurrency(totalOnce, currency)}
                 </dd>
               </div>
               <div className="flex flex-col border-t border-gray-100 p-2 sm:p-6 text-center sm:border-0 sm:border-l">
                 <dt className="order-2 mt-2 text-sm sm:text-lg leading-6 font-medium text-gray-500">
-                Recurring {typeName}
+                  Recurring {typeName}
                 </dt>
-                <dd className={`order-1 text-lg sm:text-2xl font-extrabold text-${color}-600`}>
-                {formatNumberToCurrency(totalRecurring, currency)}
+                <dd
+                  className={`order-1 text-lg sm:text-2xl font-extrabold text-${color}-600`}
+                >
+                  {formatNumberToCurrency(totalRecurring, currency)}
                 </dd>
               </div>
             </dl>

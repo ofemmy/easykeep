@@ -17,7 +17,6 @@ import {
   fetchSum,
   fetchTransactions,
 } from "../db/queries";
-import { getDateFromQuery } from "../lib/useDate";
 import { DateTime } from "luxon";
 
 const DataTableBig = dynamic(() => import("../components/DataTableBig"));

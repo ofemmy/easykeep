@@ -6,10 +6,10 @@ import { authMiddleWare } from "../../../middleware/auth";
 import { connectToDatabase } from "../../../db";
 import prisma from "../../../db/prisma";
 import { Transaction as Tr2 } from "../../../db/models/TransactionModel";
-import { getDateFromQuery, getDateWithoutTimeZone } from "../../../lib/useDate";
+import { useDate } from "../../../lib/useDate";
 import { Transaction, Prisma } from "@prisma/client";
 import { startOfMonth, addMonths, addDays, isFirstDayOfMonth } from "date-fns";
-import { fetchTransactions,fetchSum } from "../../../db/queries";
+import { fetchTransactions, fetchSum } from "../../../db/queries";
 import { DateTime } from "luxon";
 const handler = nc<ExtendedRequest, ExtendedResponse>({
   onNoMatch(req, res) {
@@ -24,14 +24,8 @@ handler
   .get(async (req, res) => {
     const month = +req.query.month;
     const year = +req.query.year;
-    let date = DateTime.utc();
-    const limit = 5;
-    if (month) {
-      date = date.set({ month });
-    }
-    if (year) {
-      date = date.set({ year });
-    }
+    const limit = +req.query.limit;
+    const date = useDate({ month, year });
     const ownerId = req.user.id;
     try {
       const data = await fetchTransactions({

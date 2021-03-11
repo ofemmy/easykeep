@@ -1,18 +1,7 @@
 import React, { useRef, useState } from "react";
 import CalenderWidget from "./CalenderWidget";
-import {
-  getDaysInMonth,
-  startOfMonth,
-  getDay,
-  getMonth,
-  getYear,
-  getDate,
-  addMonths,
-  isSameMonth,
-  format,
-} from "date-fns";
 import { DateTime } from "luxon";
-import { getDateWithoutTimeZone } from "../lib/useDate";
+
 const range = (start: number, stop: number, step: number = 1) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
 interface OCalenderProps {
@@ -71,7 +60,6 @@ const OCalender: React.FC<OCalenderProps> = ({
       getCurrentMonth={getCurrentMonth}
       getCurrentYear={getCurrentYear}
       isSameMonth={isSameMonth}
-      getDate={getDate}
       setDate={setNewDate}
     />
   );

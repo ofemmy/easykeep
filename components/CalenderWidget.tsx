@@ -31,7 +31,6 @@ function CalendarWidget({
   getCurrentYear,
   getCurrentMonth,
   isSameMonth,
-  getDate,
   setDate,
 }) {
   return (

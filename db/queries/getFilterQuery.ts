@@ -3,7 +3,7 @@ enum TrxFrequency {
   Once = "Once",
   Recurring = "Recurring",
 }
-export default function getFilterClause(filterOptions) {
+export function getFilterQuery(filterOptions) {
   const { date } = filterOptions;
   let once = TrxFrequency.Once;
   let rec = TrxFrequency.Recurring;

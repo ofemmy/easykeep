@@ -2,14 +2,17 @@ import { ExtendedResponse } from "../../../types/ExtendedApiResponse";
 import { ExtendedRequest } from "../../../types/ExtendedApiRequest";
 import nc from "next-connect";
 import { authMiddleWare } from "../../../middleware/auth";
+import { DateTime } from "luxon";
 import {
-  fetchTransactions,
-  fetchTransactionsWithPrisma,
-} from "../../../db/queries/fetchTransactionsOld";
+  fetchTransactionCount,
+  fetchTransactionsByType,
+  fetchSumByType,
+} from "../../../db/queries";
 import getTransactionTypeEnum from "../../../lib/getTransactionType";
 import getQueryFilter from "../../../db/lib/QueryFilter";
 import getQueryOptions from "../../../db/lib/QueryOptions";
 import fetchRecurringTransactionSum from "../../../db/queries/fetchRecurringTransactionSum";
+import { useDate } from "../../../lib/useDate";
 const handler = nc<ExtendedRequest, ExtendedResponse>({
   onNoMatch(req, res) {
     res.status(405).json({
@@ -21,28 +24,26 @@ const handler = nc<ExtendedRequest, ExtendedResponse>({
 handler.use(authMiddleWare).get(async (req, res) => {
   const type = req.query.type as string;
   const month = +req.query.month;
+  const year = +req.query.year || DateTime.now().get("year");
   const limit = +req.query.limit;
   const skip = +req.query.skip;
-
-  let transactionType = getTransactionTypeEnum(type);
-
+  const ownerId = req.user.id;
+  const trxType = getTransactionTypeEnum(type);
+  const date = useDate({ month, year });
   try {
-    const {
-      transactions,
-      summary,
-      totalResults,
-    } = await fetchTransactionsWithPrisma({
-      type: getTransactionTypeEnum(type),
-      month,
+    const transactions = await fetchTransactionsByType({
+      trxType,
+      date,
       limit,
       skip,
-      ownerId: req.user.id,
+      ownerId,
     });
-    const result = await fetchRecurringTransactionSum({
-      trxType: transactionType,
-      ownerId: req.user.id,
+    const totalResults = await fetchTransactionCount({
+      ownerId,
+      date,
+      trxType,
     });
-    console.log(result);
+    const summary = await fetchSumByType({ ownerId, date, trxType });
     res.status(200).json({
       msg: "success",
       data: { transactions, summary, totalResults },
