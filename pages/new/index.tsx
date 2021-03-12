@@ -63,7 +63,7 @@ const NonRecurringEntry = ({ user }) => {
       className="flex-1 relative z-0 overflow-y-auto focus:outline-none px-0 md:px-0"
       tabIndex={0}
     >
-      <div className="max-w-xl mx-auto md:mt-4">
+      <div className="max-w-xl mx-auto md:mt-4 lg:mt-28">
         <div className="flex flex-col bg-white shadow-xl overflow-y-scroll rounded-sm">
           <div className="px-4 py-6 bg-gray-700 sm:px-6 text-white">
             <div className="flex items-start justify-between space-x-3">
@@ -76,7 +76,7 @@ const NonRecurringEntry = ({ user }) => {
                     type="button"
                     className="inline-flex items-center px-1.5 py-1 border border-transparent text-xs rounded text-gray-700 bg-gray-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-semibold"
                     onClick={() => {
-                      router.push("/new3/recurring");
+                      router.push("/new/recurring");
                     }}
                   >
                     Click here to add recurring transaction

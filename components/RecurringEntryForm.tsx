@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import { TransactionType } from "@prisma/client";
 import CalenderSVG from "./svgs/CalenderSVG";
 import Calender from "./Calender";
 import { Category } from "../types/Category";
-import { addMonths } from "date-fns";
-import { getDateWithoutTimeZone } from "../lib/useDate";
 const RecurringEntryForm = ({
   handleSubmit,
   handleChange,
@@ -14,6 +13,7 @@ const RecurringEntryForm = ({
   touched,
   setFieldValue,
 }) => {
+  const router = useRouter();
   const [showCal, setShowCal] = useState(false);
   const [showRecurringFromCal, setShowRecurringFromCal] = useState(false);
   const [showRecurringToCal, setshowRecurringToCal] = useState(false);
@@ -364,6 +364,7 @@ const RecurringEntryForm = ({
         <button
           type="button"
           className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          onClick={() => router.back()}
         >
           Cancel
         </button>

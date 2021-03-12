@@ -8,36 +8,6 @@ import {
 import { camelCase, forOwn, keyBy } from "lodash";
 import { getFilterQuery } from "./getFilterQuery";
 import { DateTime } from "luxon";
-import mapToTransactionModel from "../../lib/mapToTransactionModel";
-
-// export async function createTransaction(data) {
-//   const {
-//     title,
-//     amount,
-//     entryDate,
-//     frequency,
-//     type,
-//     category,
-//     ownerId,
-//     recurringFrom,
-//     recurringTo,
-//   } = data;
-
-//   const query = sql`INSERT INTO "transactions" (title,amount,entry_date,frequency,type,category,owner_id,recurring_from,recurring_to) VALUES (${title},${amount},${entryDate},${frequency},${type},${category},${ownerId},${recurringFrom},${recurringTo}) RETURNING id`;
-//   const { rows } = await DB.query(query.text, query.values);
-//   return rows[0];
-// }
-// export async function createUser(data) {
-//   const { name, email, password } = data;
-//   const query = sql`INSERT INTO users (name,email,password) VALUES (${name},${email},${password}) RETURNING id,name,email`;
-//   const { rows } = await DB.query(query.text, query.values);
-//   return rows[0];
-// }
-// export async function findUserByEmail(email) {
-//   const query = sql`SELECT * FROM users WHERE email = ${email}`;
-//   const { rows } = await DB.query(query.text, query.values);
-//   return rows[0];
-// }
 
 export async function fetchTransactions(queryOptions: {
   date: DateTime;
@@ -47,7 +17,7 @@ export async function fetchTransactions(queryOptions: {
 }) {
   const { date, limit, skip, ownerId } = queryOptions;
   const { normalEntryFilter, recurringEntryFilter } = getFilterQuery({ date });
-  const result = await prisma.$queryRaw`SELECT * FROM transactions WHERE "ownerId" = ${ownerId} AND (${normalEntryFilter} OR ${recurringEntryFilter})`;
+  const result = await prisma.$queryRaw`SELECT * FROM transactions WHERE "ownerId" = ${ownerId} AND (${normalEntryFilter} OR ${recurringEntryFilter}) ORDER BY "entryDate" DESC LIMIT ${limit}`;
   return result;
 }
 export async function fetchTransactionsByType(queryOptions) {

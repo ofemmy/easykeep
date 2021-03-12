@@ -21,6 +21,7 @@ import {
   fetchSumByType,
 } from "../../db/queries";
 import { DateTime } from "luxon";
+import PieWidget from "../../components/PieWidget";
 
 const DataTableBig = dynamic(() => import("../../components/DataTableBig"));
 const DataTableSmall = dynamic(() => import("../../components/DataTableSmall"));
@@ -37,7 +38,7 @@ export default function TransactionType({ user, pageData }) {
   const screenWidthMatched = useWindowWidth("sm");
   const router = useRouter();
   const { type } = router.query;
-  const { setUser, month } = useContext(MyAppContext);
+  const { setUser, month, AppMainLinks } = useContext(MyAppContext);
   const [limit, setLimit] = useState(10);
   const [skip, setSkip] = useState(0);
 
@@ -57,12 +58,22 @@ export default function TransactionType({ user, pageData }) {
     <>
       <Header pageTitle={capitalize(type as string)} />
       <div className="max-6xl mx-auto border-t border-gray-200">
-        <DetailsDashboard
+        <div className="px-8 mt-5">
+          <div className="bg-white rounded-md shadow-sm w-full p-4 flex flex-col h-80 items-start">
+            <h2
+              className={`text-sm font-semibold tracking-wide uppercase p-2 bg-${color}-100 inline-block rounded-md text-${color}-600`}
+            >
+              {month.name}
+            </h2>
+            <PieWidget summary={summary} trxType={type} />
+          </div>
+        </div>
+        {/* <DetailsDashboard
           totalRecurring={summary.totalRecurring}
           totalOnce={summary.totalOnce}
           color={color}
           typeName={capitalize(type as string)}
-        />
+        /> */}
 
         <SectionHeading text={`List of ${type}`} />
         {screenWidthMatched ? (

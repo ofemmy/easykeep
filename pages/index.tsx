@@ -52,7 +52,7 @@ export const columns = [
 ];
 const getTransactions = async (config) => {
   const { month, skip, limit } = config;
-  const res = await axios.get(`/api/transactions?month=${month}`);
+  const res = await axios.get(`/api/transactions?month=${month}&limit=${limit}`);
 
   return res.data;
 };
@@ -68,7 +68,7 @@ export default function Home({ user, pageData }) {
   }, []);
   const { data, isLoading, isError } = useQuery(
     ["transactions", month],
-    () => getTransactions({ month: month.code }),
+    () => getTransactions({ month: month.code,limit:4 }),
     { initialData: pageData, keepPreviousData: true }
   );
   const { summary, transactions } = data.data;
@@ -170,7 +170,7 @@ export const getServerSideProps = withSession(async function ({ req, res }) {
   }
   const today = DateTime.utc();
   const requestOptions = {
-    limit: 5,
+    limit: 4,
     ownerId: user.id,
     date: today,
   };

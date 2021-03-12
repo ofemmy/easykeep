@@ -1,21 +1,22 @@
 import { ResponsivePie } from "@nivo/pie";
 import formatNumberToCurrency from "../lib/formatCurrency";
 export default function IndexPieWidget({ currency, summary }) {
-  console.log(summary);
   const data = [
     {
-      id: "Total Expenses",
+      id: "Expenses",
       value: summary.totalExpense,
       color: "hsl(0, 100%, 50%)",
     },
     {
-      id: "Total Income",
+      id: "Income",
       value: summary.totalIncome,
       color: "#03c048",
     },
   ];
   return (
     <ResponsivePie
+      theme={{ fontSize: 13 }}
+      enableRadialLabels={false}
       data={data}
       sliceLabel={({ value }) =>
         `${value ? formatNumberToCurrency(value, currency) : ""}`
@@ -32,6 +33,14 @@ export default function IndexPieWidget({ currency, summary }) {
       radialLabelsTextColor={{
         from: "color",
       }}
+      legends={[
+        {
+          anchor: "bottom-right",
+          direction: "column",
+          itemWidth: 90,
+          itemHeight: 20,
+        },
+      ]}
     />
   );
 }

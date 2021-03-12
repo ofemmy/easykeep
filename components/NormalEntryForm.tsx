@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import {useRouter} from "next/router";
 import { TransactionType } from "@prisma/client";
 import CalenderSVG from "./svgs/CalenderSVG";
 import Calender from "./Calender";
@@ -12,6 +13,7 @@ const NormalEntryForm = ({
   touched,
   setFieldValue,
 }) => {
+  const router = useRouter();
   const [showCal, setShowCal] = useState(false);
   const [showCalIsRecurringFrom, setShowCalIsRecurringFrom] = useState(false);
   const [showCalIsRecurringTo, setShowCalIsRecurringTo] = useState(false);
@@ -227,6 +229,7 @@ const NormalEntryForm = ({
         <button
           type="button"
           className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          onClick={() => router.back()}
         >
           Cancel
         </button>
