@@ -6,6 +6,7 @@ import { MyAppContext } from "../store";
 import CardSVG from "../components/svgs/CardSVG";
 import Link from "next/link";
 import Card from "./Card";
+import IndexPieWidget from "./IndexPieWidget";
 interface DashboardPropType {
   summary: { totalIncome: number; totalExpense: number };
 }
@@ -51,34 +52,23 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
       <div className="mt-4 grid lg:h-40 grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {/* Card component */}
         <Card
-          icon={<ScaleSVG customClasses="mr-4"/>}
+          icon={<ScaleSVG customClasses="mr-4" />}
           bgColor="bg-green-600"
           title="Total Income"
           footerHref="/transactions/income"
           value={formatNumberToCurrency(summary.totalIncome, currency)}
         />
-        
+
         <Card
-          icon={<CardSVG customClasses="mr-4"/>}
+          icon={<CardSVG customClasses="mr-4" />}
           bgColor="bg-red-600"
           title="Total Expense"
           footerHref="/transactions/expense"
           value={formatNumberToCurrency(summary.totalExpense, currency)}
         />
-        {isEmpty?null : (
-          <div className="hidden lg:block bg-white overflow-hidden shadow rounded-lg lg:py-4 py-2">
-            <Doughnut
-              data={graphData}
-              options={{
-                maintainAspectRatio: false,
-                legend: {
-                  position: "right",
-                  align: "center",
-                  labels: { usePointStyle: true },
-                },
-                layout: { padding: { right: 10, left: 10 } },
-              }}
-            />
+        {isEmpty ? null : (
+          <div className="hidden lg:block bg-white overflow-hidden shadow rounded-lg lg:py-4 py-2 lg:h-40">
+            <IndexPieWidget />
           </div>
         )}
         {/* <div className="bg-gray-500 text-white overflow-hidden shadow rounded-lg relative">
@@ -108,7 +98,7 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
               </div>
             </div>
           </div> */}
-          {/* <div className="bg-gray-600 border-t-2 px-5 py-3 lg:absolute bottom-0 left-0 right-0 uppercase">
+        {/* <div className="bg-gray-600 border-t-2 px-5 py-3 lg:absolute bottom-0 left-0 right-0 uppercase">
             <div className="text-sm">
             <Link href="/transactions/expense">
               <a
@@ -124,3 +114,18 @@ const Dashboard: React.FC<DashboardPropType> = ({ summary }) => {
   );
 };
 export default Dashboard;
+/**
+ * 
+ * <Doughnut
+              data={graphData}
+              options={{
+                maintainAspectRatio: false,
+                legend: {
+                  position: "right",
+                  align: "center",
+                  labels: { usePointStyle: true },
+                },
+                layout: { padding: { right: 10, left: 10 } },
+              }}
+            />
+ */

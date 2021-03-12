@@ -1,13 +1,19 @@
 import dynamic from "next/dynamic";
-import { useContext, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
+import Link from "next/link";
 import Header from "../components/Header";
 import withSession from "../lib/withSession";
+import formatNumberToCurrency from "../lib/formatCurrency";
+import CardSVG from "../components/svgs/CardSVG";
+import ScaleSVG from "../components/svgs/ScaleSVG";
+import Card from "../components/Card";
 import { MyAppContext } from "../store";
 import { format } from "date-fns";
 import { Skeleton } from "@chakra-ui/react";
 import { useQuery } from "react-query";
 import axios from "axios";
 import Dashboard from "../components/Dashboard";
+import IndexPieWidget from "../components/IndexPieWidget";
 import useWindowWidth from "../lib/useWindowWidth";
 import TitleComponent from "../components/TitleComponent";
 import AmountComponent from "../components/AmountComponent";
@@ -53,7 +59,7 @@ const getTransactions = async (config) => {
 
 export default function Home({ user, pageData }) {
   const screenWidthMatched = useWindowWidth("sm");
-  const { setUser, month, setSidebarOpen } = useContext(MyAppContext);
+  const { setUser, month, setSidebarOpen, currency,AppMainLinks } = useContext(MyAppContext);
   useEffect(() => {
     setUser(user);
   }, [user]);
@@ -76,7 +82,63 @@ export default function Home({ user, pageData }) {
       ) : isError ? (
         <p>Error fetching data please reload</p>
       ) : (
-        <Dashboard summary={summary} />
+        <div className="flex justify-between max-6xl mx-auto px-8 mt-8">
+          <div className="bg-white shadow-sm rounded-md h-64 w-7/12 p-5">
+            <h2 className="text-sm font-semibold text-gray-500 tracking-wide uppercase">
+              Summary &#8226; {month.name}
+            </h2>
+            <div className="mt-2 space-y-3 ">
+              <div className="flex bg-green-100 p-5 rounded-md text-green-500">
+                <div className="flex-shrink-0">
+                  <ScaleSVG />
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-green-500 truncate">
+                      Total Income
+                    </dt>
+                    <dd className="text-lg font-medium text-green-500">
+                      {formatNumberToCurrency(summary.totalIncome, currency)}
+                    </dd>
+                  </dl>
+                </div>
+                <div>
+                  <Link href={AppMainLinks.incomes.href}>
+                    <a className="uppercase text-xs p-2 bg-green-200 rounded-sm hover:text-white hover:bg-green-300">
+                      View all
+                    </a>
+                  </Link>
+                </div>
+              </div>
+              <div className="flex bg-red-100 p-5 rounded-md">
+                <div className="flex-shrink-0 text-red-500">
+                  <CardSVG />
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-red-500 truncate">
+                      Total Expenses
+                    </dt>
+                    <dd className="text-lg font-medium text-red-500">
+                      {formatNumberToCurrency(summary.totalExpense, currency)}
+                    </dd>
+                  </dl>
+                </div>
+                <div>
+                  <Link href={AppMainLinks.expenses.href}>
+                    <a className="uppercase text-xs p-2 bg-red-200 text-red-500 rounded-sm hover:text-white hover:bg-red-300">
+                      View all
+                    </a>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white shadow-sm rounded-md h-64 ml-4 w-5/12 py-4 px-2">
+            <IndexPieWidget currency={currency} summary={summary} />
+          </div>
+        </div>
+        // <Dashboard summary={summary} />
       )}
       <h2 className="max-w-6xl mx-auto mt-8 px-4 text-lg leading-6 font-medium text-gray-900">
         Recent transactions

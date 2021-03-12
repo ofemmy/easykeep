@@ -3,8 +3,6 @@ import { useContext, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import useWindowWidth from "../../lib/useWindowWidth";
 import { MyAppContext } from "../../store/index";
-import { fetchTransactions } from "../../db/queries/fetchTransactionsOld";
-import fetchRecurringTransactionSum from "../../db/queries/fetchRecurringTransactionSum";
 import withSession from "../../lib/withSession";
 import Header from "../../components/Header";
 import TrxType from "../../types/TransactionType";
