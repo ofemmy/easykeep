@@ -5,12 +5,20 @@ import nextConnect from "next-connect";
 import bcrypt from "bcryptjs";
 import { session } from "../../middleware/auth";
 import prisma from "../../db/prisma";
-import { createUser, findUserByEmail } from "../../db/queries";
+import { DefaultCategories } from "../../store";
+import Currency from "../../types/Currency";
 
 const signupHandler = nextConnect<ExtendedRequest, ExtendedResponse>();
 //only using the session middleware here so I can write user to session after successful signup
 signupHandler.use(session).post(async function (req, res) {
-  const { email, password, name } = req.body;
+  const {
+    email,
+    password,
+    name,
+    confirmPassword,
+    language,
+    currency,
+  } = req.body;
 
   try {
     const user = await prisma.user.findFirst({ where: { email } });
@@ -19,7 +27,7 @@ signupHandler.use(session).post(async function (req, res) {
         .status(400)
         .json({ status: "error", message: "User already exists" });
     }
-    if (password.length < 8) {
+    if (password.length < 8 || password !== confirmPassword) {
       return res
         .status(400)
         .json({ status: "error", message: "Password length too small" });
@@ -30,7 +38,18 @@ signupHandler.use(session).post(async function (req, res) {
       select: { email: true, id: true, name: true },
     });
     if (newUser) {
-      req.session.set<User>("user", newUser);
+      const userProfile = await prisma.profile.create({
+        data: {
+          currency,
+          language,
+          categories: DefaultCategories,
+          user: newUser.id,
+        },
+        select: { currency: true, language: true, categories: true },
+      });
+      const userData = { ...newUser, ...userProfile };
+      console.log(userProfile);
+      req.session.set<User>("user", userData);
     }
     await req.session.save();
     return res

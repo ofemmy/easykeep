@@ -22,6 +22,30 @@ export const Months = [
   { code: 11, name: "November" },
   { code: 12, name: "December" },
 ];
+export const DefaultCategories = [
+  "rent",
+  "groceries",
+  "medical",
+  "entertainment",
+  "transportation",
+  "food",
+  "utilities",
+  "insurance",
+  "debt",
+  "personal",
+  "miscellaneous",
+  "clothing",
+  "childcare",
+  "education",
+  "income",
+  "salary",
+  "leisure",
+  "travel",
+  "sports",
+  "subscriptions",
+  "music",
+  "friends",
+];
 const AppMainLinks = {
   home: {
     href: "/",
@@ -74,6 +98,8 @@ type MyAppContextType = {
       color: string;
     };
   };
+  categories: string[];
+  addCategory: Function;
 };
 export const MyAppContext = createContext<MyAppContextType>(null);
 
@@ -84,11 +110,17 @@ export default function AppStore({ children }) {
   const [month, setMonth] = useState(currentMonth);
   const [user, setUser] = useState(null);
   const [currency, setCurrency] = useState(Currency.EUR);
+  const [categories, setCategories] = useState(DefaultCategories);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [language, setLanguage] = useState("English");
   const { isLoading, setisLoading } = useIsLoading(false);
   const changeMonth = (newMonthCode) => {
     setMonth(Months.filter((mon) => mon.code === +newMonthCode)[0]);
+  };
+  const addCategory = (newCategory) => {
+    if (newCategory) {
+      setCategories([newCategory, ...categories]);
+    }
   };
   return (
     <MyAppContext.Provider
@@ -105,6 +137,8 @@ export default function AppStore({ children }) {
         isLoading,
         setisLoading,
         AppMainLinks,
+        categories,
+        addCategory,
       }}
     >
       {children}

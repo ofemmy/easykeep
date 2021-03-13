@@ -20,7 +20,7 @@ const NonRecurringEntry = ({ user }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const router = useRouter();
   const { formComponent, initialValues, schema } = useFormConfig(
-    TrxFrequency.Once
+    "normalEntryForm"
   );
   useEffect(() => {
     setUser(user);

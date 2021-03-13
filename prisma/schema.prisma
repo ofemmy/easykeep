@@ -32,7 +32,19 @@ model User {
   password     String
   transactions Transaction[]
 
+  Profile Profile?
   @@map("users")
+}
+
+model Profile {
+  id         Int      @id @default(autoincrement())
+  categories String[]
+  currency   String
+  language   String
+  user       Int
+  User       User     @relation(fields: [user], references: [id])
+
+  @@map("user_profile")
 }
 
 enum TrxFrequency {
