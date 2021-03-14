@@ -1,7 +1,31 @@
+import { useState } from "react";
+import axios from "axios";
+import { withPageAuthRequired, useUser } from "@auth0/nextjs-auth0";
+import { useRouter } from "next/router";
 import Banner from "../components/Banner";
 import Header from "../components/Header";
 import currencies from "../currencies.json";
-export default function Profile() {
+export default function Profile({ user }) {
+  const [currency, setCurrency] = useState("");
+  const [language, setLanguage] = useState("english");
+  const router = useRouter();
+  const onSubmit = async () => {
+    if (!currency || !language) {
+      return;
+    }
+    try {
+      const response = await axios.post("/api/profile", {
+        currency,
+        language,
+        ownerId: user.sub,
+      });
+      if (response.status == 201 && typeof window !== "undefined") {
+        router.push("/");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="max-6xl mx-auto border-t border-gray-200">
       <Header pageTitle={"Profile"} />
@@ -19,6 +43,8 @@ export default function Profile() {
               Set Language
             </label>
             <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
               id="location"
               name="location"
               className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-blue-500 sm:text-sm rounded-md"
@@ -36,6 +62,8 @@ export default function Profile() {
             </label>
             <div className="mt-1">
               <select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
                 id="currency"
                 name="currency"
                 className="border-gray-300
@@ -55,6 +83,7 @@ export default function Profile() {
           </div>
           <button
             type="submit"
+            onClick={onSubmit}
             className="bg-gray-600 w-5/12 mt-4 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
           >
             Set Profile
@@ -64,3 +93,4 @@ export default function Profile() {
     </div>
   );
 }
+export const getServerSideProps = withPageAuthRequired();
