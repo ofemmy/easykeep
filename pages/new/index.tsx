@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { MyAppContext } from "../../store";
 import { Formik } from "formik";
 import axios from "axios";
+import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { TrxFrequency } from "@prisma/client";
 import { useMutation } from "react-query";
 import { useToast } from "@chakra-ui/react";
@@ -106,18 +107,18 @@ const NonRecurringEntry = ({ user }) => {
 };
 
 export default NonRecurringEntry;
-
-export const getServerSideProps = withSession(async function ({ req, res }) {
-  const user = req.session.get("user");
-  if (!user) {
-    return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
-  }
-  return {
-    props: { user },
-  };
-});
+export const getServerSideProps = withPageAuthRequired();
+// export const getServerSideProps = withSession(async function ({ req, res }) {
+//   const user = req.session.get("user");
+//   if (!user) {
+//     return {
+//       redirect: {
+//         destination: "/login",
+//         permanent: false,
+//       },
+//     };
+//   }
+//   return {
+//     props: { user },
+//   };
+// });

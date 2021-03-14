@@ -3,9 +3,8 @@ import { useContext, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import useWindowWidth from "../../lib/useWindowWidth";
 import { MyAppContext } from "../../store/index";
-import withSession from "../../lib/withSession";
 import Header from "../../components/Header";
-import TrxType from "../../types/TransactionType";
+import { withPageAuthRequired, getSession } from "@auth0/nextjs-auth0";
 import { QueryClient, useQuery } from "react-query";
 import { columns } from "../index";
 import Currency from "../../types/Currency";
@@ -97,38 +96,32 @@ export default function TransactionType({ user, pageData }) {
     </>
   );
 }
-export const getServerSideProps = withSession(async function ({
-  req,
-  res,
-  query,
-}) {
-  const user = req.session.get("user");
-  if (!user) {
+export const getServerSideProps = withPageAuthRequired({
+  async getServerSideProps({ req, res, query }) {
+    const { user } = getSession(req, res);
+    const trxType = getTransactionType(query.type as string);
+    const skip = 0;
+    const limit = 10;
+    const date = DateTime.utc();
+    const ownerId = user.sub;
+    const transactions = await fetchTransactionsByType({
+      trxType,
+      date,
+      limit,
+      skip,
+      ownerId,
+    });
+    const totalResults = await fetchTransactionCount({
+      ownerId,
+      date,
+      trxType,
+    });
+    const summary = await fetchSumByType({ ownerId, date, trxType });
+    console.log(summary, totalResults);
+    const data = { transactions, totalResults, summary };
+    const result = { msg: "success", data: JSON.parse(JSON.stringify(data)) };
     return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
+      props: { user, pageData: result }, //went JSON crazy because Next JS is having problems with _id and date fields
     };
-  }
-  const trxType = getTransactionType(query.type);
-  const skip = 0;
-  const limit = 10;
-  const date = DateTime.utc();
-  const ownerId = user.id;
-  const transactions = await fetchTransactionsByType({
-    trxType,
-    date,
-    limit,
-    skip,
-    ownerId,
-  });
-  const totalResults = await fetchTransactionCount({ ownerId, date, trxType });
-  const summary = await fetchSumByType({ ownerId, date, trxType });
-  console.log(summary, totalResults);
-  const data = { transactions, totalResults, summary };
-  const result = { msg: "success", data: JSON.parse(JSON.stringify(data)) };
-  return {
-    props: { user, pageData: result }, //went JSON crazy because Next JS is having problems with _id and date fields
-  };
+  },
 });

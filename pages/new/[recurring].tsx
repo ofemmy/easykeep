@@ -1,10 +1,9 @@
 import React, { useEffect, useContext, useState, Component } from "react";
-import withSession from "../../lib/withSession";
+import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { useRouter } from "next/router";
 import { MyAppContext } from "../../store";
 import { Formik } from "formik";
 import axios from "axios";
-import { TrxFrequency } from "@prisma/client";
 import { useMutation } from "react-query";
 import { useToast } from "@chakra-ui/react";
 import useFormConfig from "../../lib/useFormConfig";
@@ -20,7 +19,7 @@ const RecurringEntry = ({ user }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const router = useRouter();
   const { formComponent, initialValues, schema } = useFormConfig(
-    TrxFrequency.Recurring
+    "recurringEntryForm"
   );
   useEffect(() => {
     setUser(user);
@@ -107,17 +106,4 @@ const RecurringEntry = ({ user }) => {
 
 export default RecurringEntry;
 
-export const getServerSideProps = withSession(async function ({ req, res }) {
-  const user = req.session.get("user");
-  if (!user) {
-    return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
-  }
-  return {
-    props: { user },
-  };
-});
+export const getServerSideProps = withPageAuthRequired();

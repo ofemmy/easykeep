@@ -163,7 +163,25 @@ export default function Home({ user, pageData }) {
 }
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps({ req, res }) {
-    return { props: {} };
+    const { user } = getSession(req, res);
+    const today = DateTime.utc();
+    const ownerId = user.sub;
+    const requestOptions = {
+      limit: 4,
+      ownerId,
+      date: today,
+    };
+    const trxList = await fetchTransactions(requestOptions);
+    const summary = await fetchSum({ ownerId, date: today });
+
+    const result = {
+      msg: "success",
+      data: { transactions: trxList, summary },
+    };
+    const pageData = JSON.parse(JSON.stringify(result));
+    return {
+      props: { pageData },
+    };
   },
 });
 // export const getServerSideProps = withSession(async function ({ req, res }) {
