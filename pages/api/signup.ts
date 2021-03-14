@@ -43,7 +43,7 @@ signupHandler.use(session).post(async function (req, res) {
           currency,
           language,
           categories: DefaultCategories,
-          user: newUser.id,
+          ownerId: "newUser.id",
         },
         select: { currency: true, language: true, categories: true },
       });

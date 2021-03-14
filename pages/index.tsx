@@ -12,7 +12,7 @@ import { format } from "date-fns";
 import { Skeleton } from "@chakra-ui/react";
 import { useQuery } from "react-query";
 import axios from "axios";
-import Dashboard from "../components/Dashboard";
+import { withPageAuthRequired, getSession } from "@auth0/nextjs-auth0";
 import IndexPieWidget from "../components/IndexPieWidget";
 import useWindowWidth from "../lib/useWindowWidth";
 import TitleComponent from "../components/TitleComponent";
@@ -52,14 +52,18 @@ export const columns = [
 ];
 const getTransactions = async (config) => {
   const { month, skip, limit } = config;
-  const res = await axios.get(`/api/transactions?month=${month}&limit=${limit}`);
+  const res = await axios.get(
+    `/api/transactions?month=${month}&limit=${limit}`
+  );
 
   return res.data;
 };
 
 export default function Home({ user, pageData }) {
   const screenWidthMatched = useWindowWidth("sm");
-  const { setUser, month, setSidebarOpen, currency,AppMainLinks } = useContext(MyAppContext);
+  const { setUser, month, setSidebarOpen, currency, AppMainLinks } = useContext(
+    MyAppContext
+  );
   useEffect(() => {
     setUser(user);
   }, [user]);
@@ -68,7 +72,7 @@ export default function Home({ user, pageData }) {
   }, []);
   const { data, isLoading, isError } = useQuery(
     ["transactions", month],
-    () => getTransactions({ month: month.code,limit:4 }),
+    () => getTransactions({ month: month.code, limit: 4 }),
     { initialData: pageData, keepPreviousData: true }
   );
   const { summary, transactions } = data.data;
@@ -157,32 +161,36 @@ export default function Home({ user, pageData }) {
     </>
   );
 }
-
-export const getServerSideProps = withSession(async function ({ req, res }) {
-  const user = req.session.get("user");
-  if (!user) {
-    return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
-  }
-  const today = DateTime.utc();
-  const requestOptions = {
-    limit: 4,
-    ownerId: user.id,
-    date: today,
-  };
-  const trxList = await fetchTransactions(requestOptions);
-  const summary = await fetchSum({ ownerId: user.id, date: today });
-
-  const result = {
-    msg: "success",
-    data: { transactions: trxList, summary },
-  };
-  const pageData = JSON.parse(JSON.stringify(result));
-  return {
-    props: { user, pageData },
-  };
+export const getServerSideProps = withPageAuthRequired({
+  async getServerSideProps({ req, res }) {
+    return { props: {} };
+  },
 });
+// export const getServerSideProps = withSession(async function ({ req, res }) {
+//   const user = req.session.get("user");
+//   if (!user) {
+//     return {
+//       redirect: {
+//         destination: "/login",
+//         permanent: false,
+//       },
+//     };
+//   }
+//   const today = DateTime.utc();
+//   const requestOptions = {
+//     limit: 4,
+//     ownerId: user.id,
+//     date: today,
+//   };
+//   const trxList = await fetchTransactions(requestOptions);
+//   const summary = await fetchSum({ ownerId: user.id, date: today });
+
+//   const result = {
+//     msg: "success",
+//     data: { transactions: trxList, summary },
+//   };
+//   const pageData = JSON.parse(JSON.stringify(result));
+//   return {
+//     props: { user, pageData },
+//   };
+// });

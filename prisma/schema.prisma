@@ -19,21 +19,18 @@ model Transaction {
   category      String
   recurringFrom DateTime?       @db.Timestamptz
   recurringTo   DateTime?       @db.Timestamptz
-  ownerId       Int
-  users         User            @relation(fields: [ownerId], references: [id])
+  ownerId       String
+
 
   @@map("transactions")
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  name         String
-  email        String
-  password     String
-  transactions Transaction[]
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String
+  password String
 
-  Profile Profile?
-  @@map("users")
 }
 
 model Profile {
@@ -41,8 +38,8 @@ model Profile {
   categories String[]
   currency   String
   language   String
-  user       Int
-  User       User     @relation(fields: [user], references: [id])
+  ownerId    String
+
 
   @@map("user_profile")
 }
