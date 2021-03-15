@@ -1,7 +1,7 @@
 import { ExtendedResponse } from "../../../types/ExtendedApiResponse";
 import { ExtendedRequest } from "../../../types/ExtendedApiRequest";
 import nc from "next-connect";
-import { authMiddleWare } from "../../../middleware/auth";
+import { withApiAuthRequired,getSession } from "@auth0/nextjs-auth0";
 import { DateTime } from "luxon";
 import {
   fetchTransactionCount,
@@ -18,13 +18,15 @@ const handler = nc<ExtendedRequest, ExtendedResponse>({
     });
   },
 });
-handler.use(authMiddleWare).get(async (req, res) => {
+handler.get(withApiAuthRequired(async (req, res) => {
   const type = req.query.type as string;
   const month = +req.query.month;
   const year = +req.query.year || DateTime.now().get("year");
   const limit = +req.query.limit;
   const skip = +req.query.skip;
-  const ownerId = req.user.id;
+  const { user } = getSession(req, res);
+      const ownerId = user.sub;
+
   const trxType = getTransactionTypeEnum(type);
   const date = useDate({ month, year });
   try {
@@ -48,5 +50,5 @@ handler.use(authMiddleWare).get(async (req, res) => {
   } catch (error) {
     res.status(500).json({ msg: "server error", data: null });
   }
-});
+}));
 export default handler;

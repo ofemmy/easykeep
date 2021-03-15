@@ -209,7 +209,6 @@ export default withPageAuthRequired(function Settings() {
   const { data, isLoading, isError, error } = useQuery(
     "profile",
     fetchUserProfile,
-    { refetchOnWindowFocus: false }
   );
   if (isLoading) {
     return <span>Loading....</span>;

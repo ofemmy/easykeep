@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { MyAppContext } from "../../store";
 import { Formik } from "formik";
 import axios from "axios";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { useToast } from "@chakra-ui/react";
 import useFormConfig from "../../lib/useFormConfig";
 
@@ -21,16 +21,14 @@ const RecurringEntry = ({ user }) => {
   const { formComponent, initialValues, schema } = useFormConfig(
     "recurringEntryForm"
   );
-  useEffect(() => {
-    setUser(user);
-  }, [user]);
+
   useEffect(() => {
     if (router.isReady && router.query.id) {
       setIsEditMode(true);
     }
   }, [isEditMode]);
   const toast = useToast();
-
+  const queryClient = useQueryClient();
   const mutation = useMutation(
     async (data: any) => {
       if (isEditMode) {
@@ -53,6 +51,7 @@ const RecurringEntry = ({ user }) => {
           isClosable: true,
           position: "top-right",
         });
+        queryClient.invalidateQueries("transactions");
       },
       onError: () => setisLoading(false),
     }

@@ -15,7 +15,7 @@ import TableOptions from "./TableOptions";
 import EditSVG from "./svgs/EditSVG";
 import DeleteSVG from "./DeleteSVG";
 
-const DataTableSmall: React.FC<DataTableProps & { isDetailPage: boolean }> = ({
+const DataTableSmall: React.FC<DataTableProps & { isDetailPage: boolean,currency:string }> = ({
   transactions,
   setSkip,
   skip,
@@ -25,9 +25,11 @@ const DataTableSmall: React.FC<DataTableProps & { isDetailPage: boolean }> = ({
   columnData,
   isDetailPage = false,
   pageCount: controlledPageCount,
+  currency
+
 }) => {
   const router = useRouter();
-  const { currency } = useContext(MyAppContext);
+  // const { currency } = useContext(MyAppContext);
   const mutation = useDeleteTransaction();
   return (
     <>

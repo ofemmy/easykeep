@@ -32,7 +32,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             </Hydrate>
           </AppStore>
         </ChakraProvider>
-        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </UserProvider>
   );

@@ -17,6 +17,7 @@ export default function IndexPieWidget({ currency, summary }) {
     <ResponsivePie
       theme={{ fontSize: 13 }}
       enableRadialLabels={false}
+      enableSliceLabels={false} //TODO show percentage
       data={data}
       sliceLabel={({ value }) =>
         `${value ? formatNumberToCurrency(value, currency) : ""}`

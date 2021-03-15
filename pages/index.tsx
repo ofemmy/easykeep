@@ -12,7 +12,7 @@ import { format } from "date-fns";
 import { Skeleton } from "@chakra-ui/react";
 import { useQuery } from "react-query";
 import axios from "axios";
-import { withPageAuthRequired, getSession } from "@auth0/nextjs-auth0";
+import { withPageAuthRequired, useUser } from "@auth0/nextjs-auth0";
 import IndexPieWidget from "../components/IndexPieWidget";
 import useWindowWidth from "../lib/useWindowWidth";
 import TitleComponent from "../components/TitleComponent";
@@ -24,6 +24,7 @@ import {
   fetchTransactions,
 } from "../db/queries";
 import { DateTime } from "luxon";
+import useProfile from "../lib/useProfile";
 
 const DataTableBig = dynamic(() => import("../components/DataTableBig"));
 const DataTableSmall = dynamic(() => import("../components/DataTableSmall"));
@@ -59,23 +60,35 @@ const getTransactions = async (config) => {
   return res.data;
 };
 
-export default function Home({ user, pageData }) {
+export default withPageAuthRequired(function Home() {
   const screenWidthMatched = useWindowWidth("sm");
-  const { setUser, month, setSidebarOpen, currency, AppMainLinks } = useContext(
+  const { setUser, month, setSidebarOpen, AppMainLinks } = useContext(
     MyAppContext
   );
-  useEffect(() => {
-    setUser(user);
-  }, [user]);
+
   useEffect(() => {
     setSidebarOpen(false);
   }, []);
-  const { data, isLoading, isError } = useQuery(
+  const { data, isLoading, isError, error } = useQuery(
     ["transactions", month],
     () => getTransactions({ month: month.code, limit: 4 }),
-    { initialData: pageData, keepPreviousData: true }
+    { keepPreviousData: true }
   );
+  const {
+    userProfile,
+    isProfileLoading,
+    isProfileError,
+    profileError,
+  } = useProfile();
+  if (isLoading || isProfileLoading) {
+    return <span>Loading....</span>;
+  }
+  if (isError || isProfileError) {
+    return <span>Error: {profileError}</span>;
+  }
+
   const { summary, transactions } = data.data;
+  const { currency } = userProfile.profile;
   return (
     <>
       <Header pageTitle="Home" />
@@ -155,35 +168,39 @@ export default function Home({ user, pageData }) {
           showNav={false}
         />
       ) : (
-        <DataTableSmall transactions={transactions} isDetailPage={false} />
+        <DataTableSmall
+          transactions={transactions}
+          isDetailPage={false}
+          currency={currency}
+        />
       )}
       <div className="mt-16"></div>
     </>
   );
-}
-export const getServerSideProps = withPageAuthRequired({
-  async getServerSideProps({ req, res }) {
-    const { user } = getSession(req, res);
-    const today = DateTime.utc();
-    const ownerId = user.sub;
-    const requestOptions = {
-      limit: 4,
-      ownerId,
-      date: today,
-    };
-    const trxList = await fetchTransactions(requestOptions);
-    const summary = await fetchSum({ ownerId, date: today });
-
-    const result = {
-      msg: "success",
-      data: { transactions: trxList, summary },
-    };
-    const pageData = JSON.parse(JSON.stringify(result));
-    return {
-      props: { pageData },
-    };
-  },
 });
+// export const getServerSideProps = withPageAuthRequired({
+//   async getServerSideProps({ req, res }) {
+//     const { user } = getSession(req, res);
+//     const today = DateTime.utc();
+//     const ownerId = user.sub;
+//     const requestOptions = {
+//       limit: 4,
+//       ownerId,
+//       date: today,
+//     };
+//     const trxList = await fetchTransactions(requestOptions);
+//     const summary = await fetchSum({ ownerId, date: today });
+
+//     const result = {
+//       msg: "success",
+//       data: { transactions: trxList, summary },
+//     };
+//     const pageData = JSON.parse(JSON.stringify(result));
+//     return {
+//       props: { pageData },
+//     };
+//   },
+// });
 // export const getServerSideProps = withSession(async function ({ req, res }) {
 //   const user = req.session.get("user");
 //   if (!user) {
