@@ -59,7 +59,7 @@ handler.patch(
         switch (action) {
           case "add":
             let cat = new Set(userProfile.categories);
-            cat.add(payload.newCategory);
+            cat.add(payload.newData);
             const updatedList = [...Array.from(cat)];
             result = await prisma.profile.update({
               where: { id: userProfile.id },
@@ -67,11 +67,11 @@ handler.patch(
                 categories: updatedList,
               },
             });
-            message = `${capitalize(payload.newCategory)} added to categories`;
+            message = `${capitalize(payload.newData)} added to categories`;
             break;
           case "delete":
             const filteredList = userProfile.categories.filter(
-              (c) => c !== payload.newCategory
+              (c) => c !== payload.newData
             );
             result = await prisma.profile.update({
               where: { id: userProfile.id },
@@ -79,11 +79,27 @@ handler.patch(
                 categories: filteredList,
               },
             });
-            message = `${capitalize(
-              payload.newCategory
-            )} removed from categories`;
+            message = `${capitalize(payload.newData)} removed from categories`;
             break;
         }
+      } else if (type === "language") {
+        const newLanguage = payload.newData;
+        result = await prisma.profile.update({
+          where: { id: userProfile.id },
+          data: {
+            language: newLanguage,
+          },
+        });
+        message = `Language changed to ${capitalize(payload.newData)}`;
+      } else if (type === "currency") {
+        const newCurrency = payload.newData;
+        result = await prisma.profile.update({
+          where: { id: userProfile.id },
+          data: {
+            currency: newCurrency,
+          },
+        });
+        message = `Currency changed to ${payload.newData}`;
       }
       res.status(200).send({ msg: message, data: result });
     } catch (error) {}
