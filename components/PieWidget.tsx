@@ -43,10 +43,11 @@ export default function PieWidget({ summary, trxType, currency,CustomLayerCompon
     <ResponsivePie
       theme={{ fontSize: 13 }}
       data={data}
-      //   enableRadialLabels={false}
+      enableRadialLabels={false}
       radialLabelsLinkHorizontalLength={17}
       radialLabelsTextXOffset={5}
-      radialLabelsLinkDiagonalLength={17}
+      radialLabelsLinkDiagonalLength={15}
+      radialLabelsLinkOffset={-6}
       sliceLabel={({ value }) =>
         `${value ? formatNumberToCurrency(value, currency) : ""}`
       }

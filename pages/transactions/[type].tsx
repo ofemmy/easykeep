@@ -69,17 +69,17 @@ export default withPageAuthRequired(function TransactionType() {
       <Header pageTitle={capitalize(type as string)} />
       <div className="max-6xl mx-auto border-t border-gray-200">
         <div className="px-8 mt-5">
-          <div className="bg-white rounded-md shadow-sm w-full p-4 flex flex-col h-80 items-start">
+          <div className="bg-white rounded-md shadow-sm w-full p-4 flex flex-col h-96 items-start">
             <h2
               className={`text-sm font-semibold tracking-wide uppercase p-2 bg-${color}-100 inline-block rounded-md text-${color}-600`}
             >
-              {month.name}
+              {`${month.name} ${DateTime.now().year}`}
             </h2>
             <PieWidget
               summary={summary}
               trxType={type}
               currency={currency}
-              CustomLayerComponent={PieTotalComponent(currency,type)}
+              CustomLayerComponent={PieTotalComponent(currency, type)}
             />
           </div>
         </div>
@@ -90,7 +90,7 @@ export default withPageAuthRequired(function TransactionType() {
           typeName={capitalize(type as string)}
         /> */}
 
-        <SectionHeading text={`List of ${type}`} />
+        <SectionHeading text={`${capitalize(type as string)}s`} />
         {screenWidthMatched ? (
           <DataTableBig
             transactions={transactions}

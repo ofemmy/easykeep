@@ -1,15 +1,16 @@
 import { ResponsivePie } from "@nivo/pie";
 import formatNumberToCurrency from "../lib/formatCurrency";
 export default function IndexPieWidget({ currency, summary }) {
+  let total = summary.totalExpense+summary.totalIncome
   const data = [
     {
       id: "Expenses",
-      value: summary.totalExpense,
+      value: ((100 * summary.totalExpense)/total).toFixed(2),
       color: "hsl(0, 100%, 50%)",
     },
     {
       id: "Income",
-      value: summary.totalIncome,
+      value: ((100 * summary.totalIncome)/total).toFixed(2),
       color: "#03c048",
     },
   ];
@@ -17,10 +18,12 @@ export default function IndexPieWidget({ currency, summary }) {
     <ResponsivePie
       theme={{ fontSize: 13 }}
       enableRadialLabels={false}
-      enableSliceLabels={false} //TODO show percentage
+      sliceLabelsSkipAngle={17}
+      sliceLabelsRadiusOffset={0.5}
+      //enableSliceLabels={false} //TODO show percentage
       data={data}
       sliceLabel={({ value }) =>
-        `${value ? formatNumberToCurrency(value, currency) : ""}`
+        `${value ? value : 0}%`
       }
       innerRadius={0.4}
       colors={{ datum: "data.color" }}
