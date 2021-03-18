@@ -8,11 +8,10 @@ import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { useQuery } from "react-query";
 import useLanguageSettings from "../lib/useLanguageSettings";
 import useCategorySettings from "../lib/useCategorySettings";
-
+import usePageLinks from "../lib/usePageLinks";
 import useCurrencySettings from "../lib/useCurrencySettings";
 
 const CategoryComponent = ({ data }) => {
-
   const [hoveredCategory, setHoveredCategory] = useState("");
   const {
     category,
@@ -20,7 +19,6 @@ const CategoryComponent = ({ data }) => {
     addNewCategory,
     deleteCategory,
   } = useCategorySettings("");
-  
 
   return (
     <div className="overflow-y-auto">
@@ -136,7 +134,6 @@ const CurrencyComponent = ({ data }) => {
   const { currency, setCurrency, changeCurrency } = useCurrencySettings(
     data.currency
   );
- 
 
   return (
     <div className="overflow-y-auto h-screen px-2">
@@ -185,8 +182,10 @@ const CurrencyComponent = ({ data }) => {
   );
 };
 export default withPageAuthRequired(function Settings() {
-  const pageLinks = ["category", "language", "currency"];
-  const [activeLink, setActiveLink] = useState("language");
+  const { pageLinks, activeLink, setActiveLink } = usePageLinks(
+    ["category", "language", "currency"],
+    "language"
+  );
 
   const ActivePage = ({ activeLink, data }) => {
     if (activeLink == "category") return <CategoryComponent data={data} />;
@@ -208,7 +207,7 @@ export default withPageAuthRequired(function Settings() {
   };
   const { data, isLoading, isError, error } = useQuery(
     "profile",
-    fetchUserProfile,
+    fetchUserProfile
   );
   if (isLoading) {
     return <span>Loading....</span>;
@@ -220,7 +219,7 @@ export default withPageAuthRequired(function Settings() {
 
   return (
     <div className="max-6xl mx-auto border-t border-gray-200">
-      <Header pageTitle={"Settings"} />
+      <Header pageTitle="Settings" />
       <div className="px-4 sm:px-6 md:px-0">
         <div className="py-6">
           <div className="sm:hidden">
@@ -360,7 +359,7 @@ export default withPageAuthRequired(function Settings() {
                       i == 0 ? "ml-0" : "ml-8"
                     }`}
                   >
-                    {capitalize(link)}
+                    {link.toUpperCase()}
                   </button>
                 ))}
               </nav>

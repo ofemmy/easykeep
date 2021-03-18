@@ -2,7 +2,7 @@ import React from "react";
 
 const SectionHeading = ({ text }) => {
   return (
-    <div className="relative my-4 max-w-6xl mx-auto px-4">
+    <div className="relative my-4 max-w-6xl">
       <div className="absolute inset-0 flex items-center" aria-hidden="true">
       </div>
       <div className="relative flex justify-start">

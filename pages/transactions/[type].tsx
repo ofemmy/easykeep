@@ -10,26 +10,19 @@ import { columns } from "../index";
 import useProfile from "../../lib/useProfile";
 import SectionHeading from "../../components/SectionHeading";
 import axios from "axios";
-import getTransactionType from "../../lib/getTransactionType";
-import capitalize from "../../lib/capitalize";
-import CardSVG from "../../components/svgs/CardSVG";
-import DetailsDashboard from "../../components/DetailsDashboard";
-import {
-  fetchTransactionsByType,
-  fetchTransactionCount,
-  fetchSumByType,
-} from "../../db/queries";
+import { capitalize } from "lodash";
 import { DateTime } from "luxon";
 import PieWidget from "../../components/PieWidget";
 import PieTotalComponent from "../../components/PieTotalComponent";
+import Dropdown from "../../components/Dropdown";
 
 const DataTableBig = dynamic(() => import("../../components/DataTableBig"));
 const DataTableSmall = dynamic(() => import("../../components/DataTableSmall"));
 
 const fetchByTransactionType = async (config) => {
-  const { month, skip, limit, type } = config;
+  const { month, skip, limit, type, frequency } = config;
   const res = await axios.get(
-    `/api/transactions/${type}?month=${month}&skip=${skip}&limit=${limit}`
+    `/api/transactions/${type}?month=${month}&skip=${skip}&limit=${limit}&frequency=${frequency}`
   );
   return res.data;
 };
@@ -41,13 +34,20 @@ export default withPageAuthRequired(function TransactionType() {
   const { setUser, month, AppMainLinks } = useContext(MyAppContext);
   const [limit, setLimit] = useState(10);
   const [skip, setSkip] = useState(0);
+  const [frequency, setFrequency] = useState("all");
 
   const { data, isLoading, isError } = useQuery(
-    ["transactions", month, skip, limit, type],
-    () => fetchByTransactionType({ skip, limit, month: month.code, type }),
+    ["transactions", month, skip, limit, type, frequency],
+    () =>
+      fetchByTransactionType({
+        skip,
+        limit,
+        month: month.code,
+        type,
+        frequency,
+      }),
     { keepPreviousData: true, staleTime: 1000 * 60 * 30 }
   );
-
   const color = type == "income" ? "green" : "red";
   const {
     userProfile,
@@ -65,7 +65,7 @@ export default withPageAuthRequired(function TransactionType() {
   const pageCount = Math.ceil(totalResults / limit);
   const { currency } = userProfile.profile;
   return (
-    <>
+    <div className="pb-8">
       <Header pageTitle={capitalize(type as string)} />
       <div className="max-6xl mx-auto border-t border-gray-200">
         <div className="px-8 mt-5">
@@ -89,8 +89,17 @@ export default withPageAuthRequired(function TransactionType() {
           color={color}
           typeName={capitalize(type as string)}
         /> */}
+        <div className="flex items-center px-8 justify-between">
+          <SectionHeading text={`${capitalize(type as string)}s`} />
+          <div className="my-4">
+            <Dropdown
+              menuItems={["all", "non-recurring only", "recurring only"]}
+              title="Filter by"
+              actionHandler={setFrequency}
+            />
+          </div>
+        </div>
 
-        <SectionHeading text={`${capitalize(type as string)}s`} />
         {screenWidthMatched ? (
           <DataTableBig
             transactions={transactions}
@@ -110,7 +119,7 @@ export default withPageAuthRequired(function TransactionType() {
           />
         )}
       </div>
-    </>
+    </div>
   );
 });
 // export const getServerSideProps = withPageAuthRequired({
