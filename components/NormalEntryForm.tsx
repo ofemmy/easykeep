@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import {useRouter} from "next/router";
+import { useRouter } from "next/router";
 import { TransactionType } from "@prisma/client";
 import CalenderSVG from "./svgs/CalenderSVG";
 import Calender from "./Calender";
-import { Category } from "../types/Category";
+import useProfile from "../lib/useProfile";
+import { useDisclosure } from "@chakra-ui/hooks";
+import { capitalize } from "lodash";
 const NormalEntryForm = ({
   handleSubmit,
   handleChange,
@@ -14,22 +16,23 @@ const NormalEntryForm = ({
   setFieldValue,
 }) => {
   const router = useRouter();
-  const [showCal, setShowCal] = useState(false);
-  const [showCalIsRecurringFrom, setShowCalIsRecurringFrom] = useState(false);
-  const [showCalIsRecurringTo, setShowCalIsRecurringTo] = useState(false);
+  const { isOpen, onToggle } = useDisclosure();
   const [isRecurring, setIsRecurring] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const categories = Object.keys(Category).sort((a, b) => a.localeCompare(b));
-  const toggleCalendar = () => {
-    setShowCal(!showCal);
-  };
-  const toggleCalendarFrom = () => {
-    setShowCalIsRecurringFrom(!showCalIsRecurringFrom);
-  };
-  const toggleCalendarTo = () => {
-    setShowCalIsRecurringTo(!showCalIsRecurringTo);
-  };
-  useEffect(() => {}, [isRecurring]);
+  const {
+    userProfile,
+    isProfileLoading,
+    isProfileError,
+    profileError,
+  } = useProfile();
+  if (isProfileLoading) {
+    return <span>Loading....</span>;
+  }
+  if (isProfileError) {
+    return <span>Error: {profileError}</span>;
+  }
+  const { categories } = userProfile.profile;
+
   return (
     <form className="space-y-6 pt-6 pb-5" onSubmit={handleSubmit}>
       <div className="">
@@ -159,25 +162,25 @@ const NormalEntryForm = ({
               className={`${
                 errors.entryDate ? "border-red-600" : "border-gray-300"
               } focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 pr-12 sm:text-sm  rounded-sm`}
-              onClick={toggleCalendar}
+              onClick={onToggle}
               value={values.entryDate.toISODate()}
               onChange={handleChange}
             />
             <div
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
-              onClick={toggleCalendar}
+              onClick={onToggle}
             >
               <span className="text-gray-500 hover:text-blue-500 sm:text-sm cursor-pointer">
                 <CalenderSVG customClasses="cursor-pointer" />
               </span>
             </div>
           </div>
-          {showCal && (
+          {isOpen && (
             <div className="absolute z-30 mt-2">
               <Calender
                 date={values.entryDate}
                 clickHandler={setFieldValue}
-                toggleCalendar={toggleCalendar}
+                toggleCalendar={onToggle}
                 field="entryDate"
               />
             </div>
@@ -212,11 +215,13 @@ const NormalEntryForm = ({
             <option defaultValue="default" disabled>
               Select Category
             </option>
-            {categories.map((cat) => (
-              <option key={cat} defaultValue={cat}>
-                {cat}
-              </option>
-            ))}
+            {categories
+              .sort((a, b) => a.localeCompare(b))
+              .map((cat) => (
+                <option key={cat} defaultValue={cat}>
+                  {capitalize(cat)}
+                </option>
+              ))}
           </select>
         </div>
         {errors.category && touched.category ? (

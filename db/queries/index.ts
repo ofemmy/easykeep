@@ -6,7 +6,7 @@ import {
   Prisma,
 } from "@prisma/client";
 import { camelCase, forOwn, keyBy } from "lodash";
-import { getFilterQuery } from "./getFilterQuery";
+import { getFilterQuery } from "../lib/getFilterQuery";
 import { DateTime } from "luxon";
 
 export async function fetchTransactions(queryOptions: {
@@ -49,7 +49,7 @@ export async function fetchTransactionsByTypeAndFrequency(queryOptions) {
       Transaction[]
     >`SELECT * FROM transactions WHERE "ownerId" = ${ownerId} AND (type=${trxType}) AND (${recurringEntryFilter}) `;
   }
-  return { transactions:result, totalResults: resultCount[0].count };
+  return { transactions: result, totalResults: resultCount[0].count };
 }
 export async function fetchTransactionsByType(queryOptions) {
   const {
@@ -72,10 +72,39 @@ export async function fetchTransactionCount(queryOptions) {
   const totalCount = await prisma.$queryRaw`SELECT count(*) FROM transactions WHERE "ownerId" = ${ownerId} AND (type=${trxType}) AND (${normalEntryFilter} OR ${recurringEntryFilter})`;
   return totalCount;
 }
-export async function fetchTransactionsByCategory(queryOptions) {
+export async function fetchTransactionSumByCategory(queryOptions) {
   const { date, ownerId, trxType } = queryOptions;
+
   const { normalEntryFilter, recurringEntryFilter } = getFilterQuery({ date });
-  const result = await prisma.$queryRaw`SELECT category, SUM(amount) FROM transactions WHERE "ownerId" = ${ownerId} AND (type=${trxType}) AND (${normalEntryFilter} OR ${recurringEntryFilter}) GROUP BY category`;
+  const result = await prisma.$queryRaw`SELECT category,SUM(amount) FROM transactions WHERE "ownerId" = ${ownerId} AND (type=${trxType}) AND (${normalEntryFilter} OR ${recurringEntryFilter}) GROUP BY category`;
+  return result;
+}
+export async function fetchTransactionsByCategory(queryOptions) {
+  // const { date, ownerId, trxType, category } = queryOptions;
+  // const once = TrxFrequency.Once;
+  // const rec = TrxFrequency.Recurring;
+  // let dateFrom = DateTime.utc().minus({ days: 28 });
+  // let dateTo = dateFrom.plus({ months: 1, days: 13 });
+  // const query = await prisma.$queryRaw`SELECT * FROM transactions WHERE "ownerId" = ${ownerId} AND (
+  //   (frequency=${
+  //     TrxFrequency.Once
+  //   } AND (DATE_TRUNC('day',${dateFrom.toJSDate()},'utc')<=DATE_TRUNC('day',"entryDate",'utc') AND DATE_TRUNC('day',${dateTo.toJSDate()},'utc') >= DATE_TRUNC('day',"entryDate",'utc')) )
+  // OR (frequency = ${
+  //   TrxFrequency.Recurring
+  // } AND (DATE_TRUNC('day',"recurringFrom",'utc') <= DATE_TRUNC('day',${dateFrom.toJSDate()},'utc') AND DATE_TRUNC('day',"recurringTo",'utc') >= DATE_TRUNC('day',${dateTo.toJSDate()},'utc')))
+  // )`;
+  // return query;
+}
+export async function fetchTransactionReport(queryOptions) {
+  const { dateFrom, dateTo, ownerId, trxType } = queryOptions;
+  const result = await prisma.$queryRaw`SELECT * FROM transactions WHERE "ownerId" = ${ownerId} AND "type" = ${trxType} AND (
+    (frequency=${
+      TrxFrequency.Once
+    } AND (DATE_TRUNC('day',${dateFrom.toJSDate()},'utc')<=DATE_TRUNC('day',"entryDate",'utc') AND DATE_TRUNC('day',${dateTo.toJSDate()},'utc') >= DATE_TRUNC('day',"entryDate",'utc')) )
+  OR (frequency = ${
+    TrxFrequency.Recurring
+  } AND (DATE_TRUNC('day',"recurringFrom",'utc') <= DATE_TRUNC('day',${dateFrom.toJSDate()},'utc') AND DATE_TRUNC('day',"recurringTo",'utc') >= DATE_TRUNC('day',${dateTo.toJSDate()},'utc')))
+  )`;
   return result;
 }
 export async function fetchRecentTransactions(queryOptions: {

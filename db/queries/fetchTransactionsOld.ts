@@ -1,6 +1,6 @@
 import { connectToDatabase } from "..";
 import { ITransaction, ITransactionModel } from "../types/ITransaction";
-import QueryOption from "../../types/QueryOption";
+import QueryOption from "../../types/QueryOptions";
 import prisma from "../prisma";
 import { TransactionType } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime";
@@ -68,7 +68,7 @@ export const fetchTransactionsWithPrisma = async function (options: {
   limit: number;
   ownerId: number;
   month: number;
-  type?:TransactionType;
+  type?: TransactionType;
 }) {
   try {
     if (!options.month) {

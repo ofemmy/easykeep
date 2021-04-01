@@ -1,7 +1,11 @@
+import { DateTime } from "luxon";
 import { NextApiRequest, NextApiResponse } from "next";
 import nc from "next-connect";
 import { useDate } from "../../../lib/useDate";
-import { fetchTransactionsByCategory } from "../../../db/queries";
+import {
+  fetchTransactionReport,
+  fetchTransactionsByCategory,
+} from "../../../db/queries";
 import { withApiAuthRequired, getSession } from "@auth0/nextjs-auth0";
 const handler = nc<NextApiRequest, NextApiResponse>({
   onNoMatch(req, res) {
@@ -20,10 +24,13 @@ handler.get(
     const { user } = getSession(req, res);
     const ownerId = user.sub;
     try {
-      const result = await fetchTransactionsByCategory({
-        date,
+      // let dateFrom = DateTime.utc().minus({ days: 28 });
+      // let dateTo = dateFrom.plus({ months: 1, days: 13 });
+      const result = await fetchTransactionReport({
+        dateFrom: DateTime.utc().minus({ days: 28 }),
+        dateTo: DateTime.utc().plus({ months: 1, days: 13 }),
         ownerId,
-        trxType,
+        trxType: "Income",
       });
       console.log(result);
       res.status(200).send({ msg: "success", result });

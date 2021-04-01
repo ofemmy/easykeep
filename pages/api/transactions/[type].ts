@@ -4,12 +4,19 @@ import nc from "next-connect";
 import { withApiAuthRequired, getSession } from "@auth0/nextjs-auth0";
 import { DateTime } from "luxon";
 import {
-  fetchTransactionCount,
-  fetchTransactionsByTypeAndFrequency,
-  fetchSumByType,
-} from "../../../db/queries";
+  fetchExpenseCount,
+  fetchExpenseSum,
+  fetchExpenses,
+} from "../../../db/queries/fetchExpenses";
 import getTransactionTypeEnum from "../../../lib/getTransactionType";
 import { useDate } from "../../../lib/useDate";
+import { Transaction } from "@prisma/client";
+import {
+  fetchIncomes,
+  fetchIncomeCount,
+  fetchIncomeSum,
+} from "../../../db/queries/fetchIncomes";
+
 const handler = nc<ExtendedRequest, ExtendedResponse>({
   onNoMatch(req, res) {
     res.status(405).json({
@@ -25,33 +32,33 @@ handler.get(
     const year = +req.query.year || DateTime.now().get("year");
     const limit = +req.query.limit;
     const skip = +req.query.skip;
-    const frequency = req.query.frequency;
+    const frequency = req.query.frequency as string;
     const { user } = getSession(req, res);
-    const ownerId = user.sub;
-
-    const trxType = getTransactionTypeEnum(type);
+    const ownerId = user.sub as string;
     const date = useDate({ month, year });
+    const frequencyType = getFrequencyType(frequency);
+
     try {
-      const {
-        transactions,
-        totalResults,
-      } = await fetchTransactionsByTypeAndFrequency({
-        trxType,
-        date,
-        limit,
-        skip,
-        ownerId,
-        frequency,
-      });
-      // const totalResults = await fetchTransactionCount({
-      //   ownerId,
-      //   date,
-      //   trxType,
-      // });
-      const summary = await fetchSumByType({ ownerId, date, trxType });
+      const resultOptions = {
+        async income() {
+          return await Promise.all([
+            fetchIncomes({ ownerId, date, limit, skip, frequencyType }),
+            fetchIncomeSum(ownerId, date),
+            fetchIncomeCount(ownerId, date, frequencyType),
+          ]);
+        },
+        async expense() {
+          return await Promise.all([
+            fetchExpenses({ ownerId, date, limit, skip, frequencyType }),
+            fetchExpenseSum(ownerId, date),
+            fetchExpenseCount(ownerId, date, frequencyType),
+          ]);
+        },
+      };
+      const [transactions, summary, totalCount] = await resultOptions[type]();
       res.status(200).json({
         msg: "success",
-        data: { transactions, summary, totalResults },
+        data: { transactions, summary, totalResults: totalCount[0].count },
       });
     } catch (error) {
       console.log(error);
@@ -60,3 +67,14 @@ handler.get(
   })
 );
 export default handler;
+
+function getFrequencyType(
+  frq: string
+): "all" | "nonRecurringOnly" | "recurringOnly" {
+  const result = {
+    all: "all",
+    "non-recurring-only": "nonRecurringOnly",
+    "recurring-only": "recurringOnly",
+  };
+  return result[frq];
+}

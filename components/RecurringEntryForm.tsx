@@ -3,7 +3,9 @@ import { useRouter } from "next/router";
 import { TransactionType } from "@prisma/client";
 import CalenderSVG from "./svgs/CalenderSVG";
 import Calender from "./Calender";
-import { Category } from "../types/Category";
+import { useDisclosure } from "@chakra-ui/react";
+import useProfile from "../lib/useProfile";
+
 const RecurringEntryForm = ({
   handleSubmit,
   handleChange,
@@ -14,20 +16,23 @@ const RecurringEntryForm = ({
   setFieldValue,
 }) => {
   const router = useRouter();
-  const [showCal, setShowCal] = useState(false);
-  const [showRecurringFromCal, setShowRecurringFromCal] = useState(false);
-  const [showRecurringToCal, setshowRecurringToCal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const categories = Object.keys(Category).sort((a, b) => a.localeCompare(b));
-  const toggleCalendar = () => {
-    setShowCal(!showCal);
-  };
-  const toggleCalendarFrom = () => {
-    setShowRecurringFromCal(!showRecurringFromCal);
-  };
-  const toggleCalendarTo = () => {
-    setshowRecurringToCal(!showRecurringToCal);
-  };
+  const { isOpen: isCalFromOpen, onToggle: onCalFromToggle } = useDisclosure();
+  const { isOpen: isCalToOpen, onToggle: onCalToToggle } = useDisclosure();
+  const { isOpen, onToggle } = useDisclosure();
+  const {
+    userProfile,
+    isProfileLoading,
+    isProfileError,
+    profileError,
+  } = useProfile();
+  if (isProfileLoading) {
+    return <span>Loading....</span>;
+  }
+  if (isProfileError) {
+    return <span>Error: {profileError}</span>;
+  }
+  const { categories } = userProfile.profile;
   return (
     <form className="space-y-6 pt-6 pb-5" onSubmit={handleSubmit}>
       <div className="">
@@ -157,25 +162,25 @@ const RecurringEntryForm = ({
               className={`${
                 errors.entryDate ? "border-red-600" : "border-gray-300"
               } focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 pr-12 sm:text-sm  rounded-sm`}
-              onClick={toggleCalendar}
+              onClick={onToggle}
               value={values.entryDate.toISODate()}
               onChange={handleChange}
             />
             <div
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
-              onClick={toggleCalendar}
+              onClick={onToggle}
             >
               <span className="text-gray-500 hover:text-blue-500 sm:text-sm cursor-pointer">
                 <CalenderSVG customClasses="cursor-pointer" />
               </span>
             </div>
           </div>
-          {showCal && (
+          {isOpen && (
             <div className="absolute z-30 mt-2">
               <Calender
                 date={values.entryDate}
                 clickHandler={setFieldValue}
-                toggleCalendar={toggleCalendarFrom}
+                toggleCalendar={onToggle}
                 field="entryDate"
               />
             </div>
@@ -205,13 +210,13 @@ const RecurringEntryForm = ({
               className={`${
                 errors.recurringFrom ? "border-red-600" : "border-gray-300"
               } focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 pr-12 sm:text-sm  rounded-sm`}
-              onClick={toggleCalendarFrom}
+              onClick={onCalFromToggle}
               value={values.recurringFrom.toISODate()}
               onChange={handleChange}
             />
             <div
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
-              onClick={toggleCalendarFrom}
+              onClick={onCalFromToggle}
             >
               <span className="text-gray-500 hover:text-blue-500 sm:text-sm cursor-pointer">
                 <CalenderSVG customClasses="cursor-pointer" />
@@ -234,12 +239,12 @@ const RecurringEntryForm = ({
           </div> */}
         </div>
 
-        {showRecurringFromCal && (
+        {isCalFromOpen && (
           <div className="absolute z-30 mt-2">
             <Calender
               date={values.recurringFrom}
               clickHandler={setFieldValue}
-              toggleCalendar={toggleCalendarFrom}
+              toggleCalendar={onCalFromToggle}
               field="recurringFrom"
             />
           </div>
@@ -268,13 +273,13 @@ const RecurringEntryForm = ({
               className={`${
                 errors.recurringTo ? "border-red-600" : "border-gray-300"
               } focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 pr-12 sm:text-sm  rounded-sm`}
-              onClick={toggleCalendarTo}
+              onClick={onCalToToggle}
               value={values.recurringTo.toISODate()}
               onChange={handleChange}
             />
             <div
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
-              onClick={toggleCalendarTo}
+              onClick={onCalToToggle}
             >
               <span className="text-gray-500 hover:text-blue-500 sm:text-sm cursor-pointer">
                 <CalenderSVG customClasses="cursor-pointer" />
@@ -309,12 +314,12 @@ const RecurringEntryForm = ({
           </div>
         </div>
 
-        {showRecurringToCal && (
+        {isCalToOpen && (
           <div className="absolute z-30 mt-2">
             <Calender
               date={values.recurringTo}
               clickHandler={setFieldValue}
-              toggleCalendar={toggleCalendarTo}
+              toggleCalendar={onCalToToggle}
               field="recurringTo"
             />
           </div>

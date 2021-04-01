@@ -1,11 +1,8 @@
-import { connectToDatabase } from "../../db";
-import fetchRecurringTransactionSum from "../../db/queries/fetchRecurringTransactionSum";
-import getQueryFilter from "../../db/lib/QueryFilter";
-import TransactionType from "../../types/TransactionType";
+import { fetchTransactions } from "../../db/queries/newQueries";
 const handler = async (req, res) => {
-  const result = await fetchRecurringTransactionSum({userID:"6020c64db6b25d4b3531cc9d",trxType:TransactionType.EXPENSE});
-  console.log(result);
-  res.status(200).json({ msg: "success" });
+  // const result = await fetchTransactions({});
+  // console.log(result);
+  // res.status(200).json({ msg: "success", data: result });
 };
 
 export default handler;

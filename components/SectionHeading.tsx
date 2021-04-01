@@ -1,8 +1,8 @@
 import React from "react";
 
-const SectionHeading = ({ text }) => {
+const SectionHeading = ({ text,customClasses="" }) => {
   return (
-    <div className="relative my-4 max-w-6xl">
+    <div className={`relative max-w-6xl ${customClasses}`}>
       <div className="absolute inset-0 flex items-center" aria-hidden="true">
       </div>
       <div className="relative flex justify-start">

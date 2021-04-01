@@ -4,7 +4,10 @@ import { withApiAuthRequired, getSession } from "@auth0/nextjs-auth0";
 import prisma from "../../../db/prisma";
 import { useDate } from "../../../lib/useDate";
 import { Transaction } from "@prisma/client";
-import { fetchTransactions, fetchSum } from "../../../db/queries";
+import { fetchSum } from "../../../db/queries";
+import { fetchSumByType } from "../../../db/queries/fetchSumByType";
+import { fetchTransactions } from "../../../db/queries/fetchTransactions";
+
 const handler = nc<NextApiRequest, NextApiResponse>({
   onNoMatch(req, res) {
     res.status(405).json({
@@ -28,7 +31,10 @@ handler
           ownerId,
           limit,
         });
-        const transactionSum = await fetchSum({ ownerId, date });
+        const transactionSum = await fetchSumByType({
+          ownerId,
+          date,
+        });
         res.status(200).json({
           msg: "success",
           data: {
