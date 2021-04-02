@@ -7,7 +7,6 @@ import usePageLinks from "../lib/usePageLinks";
 import ReportComponent from "../components/ReportComponent";
 import { MyAppContext } from "../store";
 import { TransactionType } from "@prisma/client";
-import axios from "axios";
 export default withPageAuthRequired(function Report() {
   const { month } = useContext(MyAppContext);
   const { pageLinks, activeLink, setActiveLink } = usePageLinks(
@@ -15,22 +14,24 @@ export default withPageAuthRequired(function Report() {
     "income"
   );
 
-  const fetchReport = async ({ queryKey }) => {
-    const [_, month, activeLink] = queryKey;
-    const trxType =
-      activeLink === "income"
-        ? TransactionType.Income
-        : TransactionType.Expense;
-    const { data } = await axios.get(
-      `/api/transactions/report?month=${month}&type=${trxType}`
-    );
-    return data;
-  };
-  const queryResult = useQuery(
-    ["report", month.code, activeLink],
-    fetchReport,
-    { staleTime: 1000 * 60 * 30 }
-  );
+  // const fetchReport = async ({ queryKey }) => {
+  //   const [_, month, activeLink] = queryKey;
+  //   const trxType =
+  //     activeLink === "income"
+  //       ? TransactionType.Income
+  //       : TransactionType.Expense;
+  //   const { data } = await axios.post(`/api/transactions/report`, {
+  //     trxType,
+  //     fromDate: new Date(),
+  //     toDate: new Date(),
+  //   });
+  //   return data;
+  // };
+  // const queryResult = useQuery(
+  //   ["report", month.code, activeLink],
+  //   fetchReport,
+  //   { staleTime: 1000 * 60 * 30 }
+  // );
   return (
     <>
       <Header pageTitle="Report" />

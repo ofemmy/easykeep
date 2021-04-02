@@ -1,12 +1,14 @@
+import { Transaction } from "@prisma/client";
 import { DateTime } from "luxon";
 import { NextApiRequest, NextApiResponse } from "next";
+import { withApiAuthRequired, getSession } from "@auth0/nextjs-auth0";
 import nc from "next-connect";
 import { useDate } from "../../../lib/useDate";
 import {
   fetchTransactionReport,
   fetchTransactionsByCategory,
 } from "../../../db/queries";
-import { withApiAuthRequired, getSession } from "@auth0/nextjs-auth0";
+import { fetchReport } from "../../../db/queries/fetchReport";
 const handler = nc<NextApiRequest, NextApiResponse>({
   onNoMatch(req, res) {
     res.status(405).json({
@@ -15,25 +17,22 @@ const handler = nc<NextApiRequest, NextApiResponse>({
     });
   },
 });
-handler.get(
+handler.post(
   withApiAuthRequired(async (req, res) => {
-    const trxType = req.query.type;
-    const month = +req.query.month;
-    const year = +req.query.year;
-    const date = useDate({ month, year });
+    const { trxType, fromDate, toDate } = req.body;
     const { user } = getSession(req, res);
     const ownerId = user.sub;
+    const dateFrom = DateTime.fromJSDate(new Date(fromDate));
+    const dateTo = DateTime.fromJSDate(new Date(toDate));
+    console.log(dateFrom.toLocaleString(), dateTo.toLocaleString());
     try {
-      // let dateFrom = DateTime.utc().minus({ days: 28 });
-      // let dateTo = dateFrom.plus({ months: 1, days: 13 });
-      const result = await fetchTransactionReport({
-        dateFrom: DateTime.utc().minus({ days: 28 }),
-        dateTo: DateTime.utc().plus({ months: 1, days: 13 }),
+      const result = await fetchReport({
+        dateFrom,
+        dateTo,
         ownerId,
-        trxType: "Income",
+        trxType: trxType === "Income" ? "income" : "expense",
       });
-      console.log(result);
-      res.status(200).send({ msg: "success", result });
+      res.status(200).send({ msg: "success", result: transformReport(result) });
     } catch (error) {
       console.log(error);
       res.status(500).json({ msg: "server error", data: null });
@@ -41,3 +40,19 @@ handler.get(
   })
 );
 export default handler;
+
+function transformReport(results: Transaction[]) {
+  const res = results.reduce((acc, currValue) => {
+    if (!acc[currValue.category]) {
+      acc[currValue.category] = { totalSum: 0, transactions: [] };
+    }
+    acc[currValue.category].totalSum += currValue.amount;
+    acc[currValue.category].transactions = [
+      ...acc[currValue.category].transactions,
+      currValue,
+    ];
+    return acc;
+  }, {});
+  return res;
+}
+//[{ groceries: [1, 2, 3, 4] }];
