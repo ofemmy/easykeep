@@ -27,6 +27,6 @@ export const QueryFilter = {
     return Prisma.sql`DATE_TRUNC('day',${dateFrom.toJSDate()},'utc')<=DATE_TRUNC('day',"entryDate",'utc') AND DATE_TRUNC('day',${dateTo.toJSDate()},'utc') >= DATE_TRUNC('day',"entryDate",'utc')`;
   },
   recurringBetween(dateFrom: DateTime, dateTo: DateTime) {
-    return Prisma.sql`DATE_TRUNC('day',"recurringFrom",'utc') <= DATE_TRUNC('day',${dateFrom.toJSDate()},'utc') AND DATE_TRUNC('day',"recurringTo",'utc') >= DATE_TRUNC('day',${dateTo.toJSDate()},'utc')`;
+    return Prisma.sql`DATE_TRUNC('day',"recurringFrom",'utc') <= DATE_TRUNC('day',${dateTo.toJSDate()},'utc') AND DATE_TRUNC('day',"recurringTo",'utc') >= DATE_TRUNC('day',${dateFrom.toJSDate()},'utc')`;
   },
 };

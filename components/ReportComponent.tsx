@@ -20,9 +20,13 @@ import { ReportPanel } from "./ReportPanel";
 export default function ReportComponent({ month, active }) {
   const { isOpen: isCalFromOpen, onToggle: onCalFromToggle } = useDisclosure();
   const { isOpen: isCalToOpen, onToggle: onCalToToggle } = useDisclosure();
-  const [fromDate, setFromDate] = useState(DateTime.utc().startOf("month"));
+  const [fromDate, setFromDate] = useState(
+    DateTime.utc().minus({ months: 6 }).startOf("month")
+  );
   const [toDate, setToDate] = useState(DateTime.utc().endOf("month"));
-  const fromDateRef = useRef(DateTime.utc().startOf("month"));
+  const fromDateRef = useRef(
+    DateTime.utc().minus({ months: 6 }).startOf("month")
+  );
   const toDateRef = useRef(DateTime.utc().endOf("month"));
   const fetchReport = async ({ queryKey }) => {
     const [_, fromDate, toDate, active] = queryKey;
@@ -153,7 +157,11 @@ export default function ReportComponent({ month, active }) {
           </div>
         </div>
       </div>
-      <SectionHeading text="Categories" customClasses="my-4" />
+      <SectionHeading
+        text="Categories"
+        customClasses="my-4"
+        subText="Click on category name to see transactions under each category"
+      />
       <ReportPanel active={active} queryObject={queryObj} />
     </div>
   );

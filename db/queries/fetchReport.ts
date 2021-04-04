@@ -31,7 +31,9 @@ export async function fetchExpenseReport(queryOptions: QueryOptions) {
     ownerId
   )} AND ${QueryFilter.recurringBetween(dateFrom, dateTo)}`;
 }
-export async function fetchReport(queryOptions: QueryOptions) {
+export async function fetchReport(
+  queryOptions: QueryOptions
+): Promise<Transaction[]> {
   const { ownerId, dateFrom, dateTo, trxType } = queryOptions;
   const resultObject = {
     async income() {

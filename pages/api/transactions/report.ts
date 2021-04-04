@@ -1,5 +1,5 @@
 import { Transaction } from "@prisma/client";
-import { DateTime } from "luxon";
+import { DateTime, Interval } from "luxon";
 import { NextApiRequest, NextApiResponse } from "next";
 import { withApiAuthRequired, getSession } from "@auth0/nextjs-auth0";
 import nc from "next-connect";
@@ -32,6 +32,11 @@ handler.post(
         ownerId,
         trxType: trxType === "Income" ? "income" : "expense",
       });
+
+      result.forEach((trx) =>
+        getRecurringTransactionValidity({ dateFrom, dateTo, transaction: trx })
+      );
+      //console.log(result);
       res.status(200).send({ msg: "success", result: transformReport(result) });
     } catch (error) {
       console.log(error);
@@ -46,7 +51,10 @@ function transformReport(results: Transaction[]) {
     if (!acc[currValue.category]) {
       acc[currValue.category] = { totalSum: 0, transactions: [] };
     }
-    acc[currValue.category].totalSum += currValue.amount;
+    acc[currValue.category].totalSum +=
+      currValue.frequency === "Once"
+        ? currValue.amount
+        : currValue["multipliedTotal"];
     acc[currValue.category].transactions = [
       ...acc[currValue.category].transactions,
       currValue,
@@ -55,4 +63,65 @@ function transformReport(results: Transaction[]) {
   }, {});
   return res;
 }
-//[{ groceries: [1, 2, 3, 4] }];
+function getRecurringTransactionValidity({
+  dateFrom,
+  dateTo,
+  transaction,
+}: {
+  dateFrom: DateTime;
+  dateTo: DateTime;
+  transaction: Transaction;
+}) {
+  if (transaction.frequency === "Once") return transaction;
+  let interval;
+  const { recurringFrom, recurringTo } = transaction;
+  const recFrom = DateTime.fromJSDate(new Date(recurringFrom));
+  const recTo = DateTime.fromJSDate(new Date(recurringTo));
+  //handle the 2 edge cases first
+  if (
+    (dateFrom < recFrom && dateTo.hasSame(recFrom, "day")) ||
+    (dateFrom.hasSame(recTo, "day") && dateTo > recTo)
+  ) {
+    console.log("case 1");
+    interval = 1;
+  } else if (dateFrom <= recFrom) {
+    console.log("case 2");
+    interval = Math.min(
+      Math.ceil(recTo.diff(recFrom, "months").toObject().months),
+      Math.ceil(dateTo.diff(recFrom, "months").toObject().months)
+    );
+  } else if (dateFrom > recFrom && dateTo <= recTo) {
+    console.log("case 3");
+    interval = Math.ceil(dateTo.diff(dateFrom, "months").toObject().months);
+  } else if (dateFrom > recFrom && dateTo > recTo) {
+    console.log("case 4");
+    interval = Math.ceil(recTo.diff(dateFrom, "months").toObject().months);
+  } else {
+    console.log("invalid case");
+    interval = 19000;
+  }
+  // if (
+  //   (dateFrom < recFrom && dateTo.hasSame(recFrom, "day")) ||
+  //   (dateFrom.hasSame(recTo, "day") && dateTo > recTo)
+  // ) {
+  //   console.log("case 1 and 8");
+  //   interval = 1;
+  // } else if (dateFrom <= recFrom && dateTo > recFrom && dateTo < recFrom) {
+  //   console.log("case 2 and 3");
+  //   interval = Math.ceil(dateTo.diff(recFrom, "months").toObject().months);
+  //   console.log(interval);
+  // } else if (dateFrom.hasSame(recFrom, "day") && dateTo >= recTo) {
+  //   console.log("case 4 and 5");
+  //   interval = Math.ceil(recTo.diff(recFrom, "months").toObject().months);
+  // } else if (dateFrom > recFrom && dateTo < recTo) {
+  //   console.log("case 6");
+  //   interval = Math.ceil(dateTo.diff(dateFrom, "months").toObject().months);
+  // } else if (dateFrom > recFrom && dateTo >= recTo) {
+  //   console.log("case 7");
+  //   interval = Math.ceil(recTo.diff(dateFrom, "months").toObject().months);
+  // } else {
+  //   interval = 19000; //to signal error
+  // }
+  transaction["interval"] = interval;
+  transaction["multipliedTotal"] = Number(transaction.amount) * interval;
+}

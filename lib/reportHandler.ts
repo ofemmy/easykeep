@@ -1,4 +1,4 @@
-import { Transaction } from "@prisma/client";
+import { Transaction, TrxFrequency } from "@prisma/client";
 import { reduce, first, last } from "lodash";
 type Report = {
   [category: string]: { totalSum: number; transactions: Transaction[] };
@@ -15,10 +15,14 @@ export function calculateSum(resultObj: Report) {
 }
 export function calculateLowestAndHighestValue(resultObj: Report) {
   const transactions = Object.entries(resultObj)
-    .map((res) => res[1].transactions)
-    .flat();
+    .flatMap((res) => res[1].transactions)
+    .map((trx) => {
+      trx["multipliedTotal"] = trx["multipliedTotal"] || trx.amount;
+      return trx;
+    });
   const sortedTransactions = transactions.sort(
-    (trx1, trx2) => Number(trx1.amount) - Number(trx2.amount)
+    (trx1, trx2) =>
+      Number(trx1["multipliedTotal"]) - Number(trx2["multipliedTotal"])
   );
   return [first(sortedTransactions), last(sortedTransactions)];
 }
@@ -27,4 +31,9 @@ export function getLowestAndHighestCategory(resultObj: Report) {
     (result1, result2) => result1[1].totalSum - result2[1].totalSum
   );
   return [first(result), last(result)];
+}
+export function getRecurringItems(resultObj: Report) {
+  return Object.entries(resultObj)
+    .flatMap((result) => result[1].transactions)
+    .filter((trx) => trx.frequency === TrxFrequency.Recurring);
 }
