@@ -33,6 +33,18 @@ model User {
 
 }
 
+model Category {
+  id            Int             @id @default(autoincrement())
+  title         String
+  budget        Decimal?
+  rollOver      Boolean?
+  runningBudget Decimal?
+  ownerId       String
+  type          TransactionType
+
+  @@map("categories")
+}
+
 model Profile {
   id         Int      @id @default(autoincrement())
   categories String[]

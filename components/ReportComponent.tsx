@@ -149,8 +149,8 @@ export default function ReportComponent({ month, active }) {
           <div>
             <button
               onClick={generateReport}
-              className="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600
-            hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              className="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-light
+            hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
               Generate Report
             </button>

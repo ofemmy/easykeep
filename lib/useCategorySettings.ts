@@ -1,3 +1,7 @@
+import { Category } from "@prisma/client";
+import { useMutation, useQueryClient } from "react-query";
+import { useToast } from "@chakra-ui/react";
+import axios from "axios";
 import { useState } from "react";
 import useSettings from "./useSettings";
 import { forOwn } from "lodash";
@@ -11,56 +15,60 @@ const validationSchema = Yup.object({
   rollOver: Yup.boolean().optional(),
 });
 export default function useCategorySettings(initialValue = null) {
-  const dummyData = [
-    {
-      id: 1,
-      title: "Clothing",
-      type: "Expense",
-      budget: 2000,
-      runningBudget: 1300,
-      rollOver: true,
+  const queryClient = useQueryClient();
+  const toast = useToast();
+  const mutation = useMutation(
+    async (newCategory) => {
+      const response = await axios.post("/api/category", newCategory);
+      return response.data;
     },
     {
-      id: 2,
-      title: "Food",
-      type: "Expense",
-      budget: 3500,
-      runningBudget: 1500,
-      rollOver: true,
+      onSuccess: (data) => {
+        queryClient.invalidateQueries("category");
+        toast({
+          description: data.msg,
+          status: data.status,
+          duration: 2000,
+          position: "top",
+        });
+      },
+      onError: (error) => {
+        toast({
+          description: error["response"]["data"]["msg"],
+          status: "error",
+          duration: 2000,
+          position: "top",
+        });
+      },
+    }
+  );
+  const removemCategoryMutation = useMutation(
+    async (category: Category) => {
+      const response = await axios.delete(`/api/category?id=${category.id}`);
+      return response.data;
     },
     {
-      id: 3,
-      title: "Utilities",
-      type: "Expense",
-      budget: 2500,
-      runningBudget: 900,
-      rollOver: true,
-    },
-    {
-      id: 4,
-      title: "Salaries",
-      type: "Income",
-      budget: null,
-      runningBudget: null,
-      rollOver: null,
-    },
-    {
-      id: 5,
-      title: "Gifts",
-      type: "Income",
-      budget: null,
-      runningBudget: null,
-      rollOver: null,
-    },
-    {
-      id: 6,
-      title: "Insurances",
-      type: "Expense",
-      budget: 1000,
-      runningBudget: 650,
-      rollOver: true,
-    },
-  ];
+      onSuccess: (data) => {
+        queryClient.invalidateQueries("category");
+        toast({
+          description: data.msg,
+          status: "success",
+          duration: 2000,
+          position: "top",
+        });
+      },
+    }
+  );
+  const addNewCategory = (category) => {
+    if (category) {
+      mutation.mutate(category);
+    }
+  };
+  const removeSelectedCategory = (category) => {
+    if (category) {
+      removemCategoryMutation.mutate(category);
+    }
+  };
   const categoryForm = useFormik({
     initialValues: {
       title: "",
@@ -70,40 +78,40 @@ export default function useCategorySettings(initialValue = null) {
       rollOver: false,
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => console.log("submitted", values),
+    validateOnBlur: false,
+    validateOnChange: false,
+    onSubmit: (values, actions) => {
+      addNewCategory(values);
+      actions.resetForm({
+        values: initialValue,
+      });
+    },
   });
-  const [categories, _] = useState(dummyData);
   const [selectedCategory, setCategory] = useState({
     title: "",
     trxType: "Income",
     budget: 0,
     rollOver: false,
   });
-  const { mutation } = useSettings("categories");
-  const addNewCategory = (category) => {
-    if (category) {
-      mutation.mutate({ newData: category, action: "add", type: "categories" });
-    }
-  };
+
   const editSelectedCategory = (category) => {
     forOwn(category, (value, key) =>
       categoryForm.setFieldValue(key, value, false)
     );
     console.log(category);
   };
-  const deleteCategory = (category) => {
-    mutation.mutate({
-      newData: category,
-      action: "delete",
-    });
-  };
+  // const deleteCategory = (category) => {
+  //   mutation.mutate({
+  //     newData: category,
+  //     action: "delete",
+  //   });
+  // };
   return {
-    categories,
     categoryForm,
     selectedCategory,
+    removeSelectedCategory,
     editSelectedCategory,
     setCategory,
     addNewCategory,
-    deleteCategory,
   };
 }

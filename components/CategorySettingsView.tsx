@@ -8,15 +8,25 @@ import {
 } from "@chakra-ui/react";
 import { Switch } from "@headlessui/react";
 import useCategorySettings from "../lib/useCategorySettings";
+import { useCategory } from "../lib/useCategory";
 
 export default function CategorySettingsView({ data }) {
   const {
-    categories,
+    removeSelectedCategory,
     editSelectedCategory,
     categoryForm,
   } = useCategorySettings();
 
   const [trxType, setTrxType] = useState("Expense");
+  const [mode, setMode] = useState("add");
+  const { categories: result, isLoading, isError, error } = useCategory();
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  if (isError) {
+    return <div>{error}</div>;
+  }
+  const { data: categories } = result;
   return (
     <div className="grid grid-cols-3 gap-4">
       <div className="col-span-2">
@@ -70,14 +80,25 @@ export default function CategorySettingsView({ data }) {
                           {category.budget ? `${category.budget}$` : "N/A"}
                         </dd>
                       </dl>
-
-                      <button
-                        onClick={() => editSelectedCategory(category)}
-                        type="button"
-                        className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
-                      >
-                        Edit
-                      </button>
+                      <div className="flex">
+                        <button
+                          onClick={() => {
+                            setMode("edit");
+                            editSelectedCategory(category);
+                          }}
+                          type="button"
+                          className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => removeSelectedCategory(category)}
+                          type="button"
+                          className="inline-flex ml-4 items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   </AccordionPanel>
                 </AccordionItem>
@@ -98,8 +119,9 @@ export default function CategorySettingsView({ data }) {
                     id={option}
                     name="type"
                     type="radio"
-                    defaultChecked={categoryForm.values.type === option}
-                    value={categoryForm.values.type}
+                    checked={categoryForm.values.type == option}
+                    defaultChecked={categoryForm.values.type == option}
+                    value={option}
                     onChange={categoryForm.handleChange}
                     onBlur={categoryForm.handleBlur}
                     className="focus:ring-yellow-500 h-4 w-4 text-yellow-600 border-yellow-300"
@@ -213,9 +235,10 @@ export default function CategorySettingsView({ data }) {
           </div>
           <button
             type="submit"
+            onClick={() => setMode("add")}
             className="inline-flex mt-4 items-center justify-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-light hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 uppercase"
           >
-            Add Category
+            {mode === "add" ? "Add Category" : "Update Category"}
           </button>
         </form>
       </div>

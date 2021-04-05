@@ -189,7 +189,7 @@ export default withPageAuthRequired(function Settings() {
   );
 
   const ActivePage = ({ activeLink, data }) => {
-    if (activeLink == "category") return <CategorySettingsView data={data}/>;
+    if (activeLink == "category") return <CategorySettingsView data={data} />;
     if (activeLink == "language") return <LanguageComponent data={data} />;
     if (activeLink == "currency") return <CurrencyComponent data={data} />;
   };

@@ -72,7 +72,7 @@ export const ReportPanel = ({
                   _focus={{ outline: "none" }}
                   color="#4b5563"
                   py={4}
-                  _expanded={{ bg: "#374151", color: "white" }}
+                  _expanded={{ bg: "#407cca", color: "white" }}
                 >
                   <div className="flex-1 flex items-center min-w-0 justify-between">
                     <div>
