@@ -7,7 +7,7 @@ import CardSVG from "../components/svgs/CardSVG";
 import Currency from "../types/Currency";
 import AddSVG from "../components/svgs/AddSVG";
 import { DateTime } from "luxon";
-import DocumentSVG from "../components/svgs/DocumentSVG";
+import ChartSVG from "../components/svgs/ChartSVG";
 export const Months = [
   { code: 1, name: "January" },
   { code: 2, name: "February" },
@@ -75,7 +75,7 @@ const AppMainLinks = {
     href: "/report",
     name: "Report",
     color: "",
-    icon: <DocumentSVG customClasses="mr-4" />,
+    icon: <ChartSVG customClasses="mr-4" />,
   },
 };
 type MyAppContextType = {

@@ -6,6 +6,10 @@ module.exports = {
     extend: {
       colors: {
         blueGray: colors.blueGray,
+        primary: "#1a365c",
+        "primary-light": "#407cca",
+        "primary-dark": "#2867b9",
+        secondary: "#d9780b",
       },
     },
   },

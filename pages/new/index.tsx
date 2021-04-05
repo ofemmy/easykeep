@@ -65,7 +65,7 @@ const NonRecurringEntry = ({ user }) => {
     >
       <div className="max-w-xl mx-auto md:mt-4 lg:mt-28">
         <div className="flex flex-col bg-white shadow-xl overflow-y-scroll rounded-sm">
-          <div className="px-4 py-6 bg-gray-700 sm:px-6 text-white">
+          <div className="px-4 py-6 bg-primary-light sm:px-6 text-white">
             <div className="flex items-start justify-between space-x-3">
               <div className="space-y-2">
                 <h2 id="slide-over-heading" className="text-lg font-medium ">

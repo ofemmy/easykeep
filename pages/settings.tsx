@@ -10,6 +10,7 @@ import useLanguageSettings from "../lib/useLanguageSettings";
 import useCategorySettings from "../lib/useCategorySettings";
 import usePageLinks from "../lib/usePageLinks";
 import useCurrencySettings from "../lib/useCurrencySettings";
+import CategorySettingsView from "../components/CategorySettingsView";
 
 const CategoryComponent = ({ data }) => {
   const [hoveredCategory, setHoveredCategory] = useState("");
@@ -184,11 +185,11 @@ const CurrencyComponent = ({ data }) => {
 export default withPageAuthRequired(function Settings() {
   const { pageLinks, activeLink, setActiveLink } = usePageLinks(
     ["category", "language", "currency"],
-    "language"
+    "category"
   );
 
   const ActivePage = ({ activeLink, data }) => {
-    if (activeLink == "category") return <CategoryComponent data={data} />;
+    if (activeLink == "category") return <CategorySettingsView data={data}/>;
     if (activeLink == "language") return <LanguageComponent data={data} />;
     if (activeLink == "currency") return <CurrencyComponent data={data} />;
   };
@@ -349,13 +350,14 @@ export default withPageAuthRequired(function Settings() {
               <nav className="-mb-px flex">
                 {pageLinks.map((link, i) => (
                   <button
+                    type="button"
                     key={link}
                     onClick={() => setActiveLink(link)}
                     className={`${
                       activeLink == link
                         ? "border-yellow-500 text-yellow-600"
-                        : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                    }  whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                        : "text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                    }  whitespace-nowrap border-transparent py-4 px-1 border-b-2 font-medium text-sm ${
                       i == 0 ? "ml-0" : "ml-8"
                     }`}
                   >
