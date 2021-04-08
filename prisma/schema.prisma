@@ -16,7 +16,8 @@ model Transaction {
   type          TransactionType
   frequency     TrxFrequency
   entryDate     DateTime        @db.Timestamptz
-  category      String
+  category      Category        @relation(fields: [categoryId], references: [id])
+  categoryId    Int
   recurringFrom DateTime?       @db.Timestamptz
   recurringTo   DateTime?       @db.Timestamptz
   ownerId       String
@@ -41,6 +42,7 @@ model Category {
   runningBudget Decimal?
   ownerId       String
   type          TransactionType
+  transactions  Transaction[]
 
   @@map("categories")
 }

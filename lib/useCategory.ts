@@ -12,5 +12,5 @@ export function useCategory() {
     fetchCategories,
     { staleTime: 1000 * 60 * 30 }
   );
-  return { categories: data, isLoading, isError, error };
+  return { result: data, isLoading, isError, error };
 }

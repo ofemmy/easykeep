@@ -42,7 +42,7 @@ export default function useCategorySettings(initialValue = null) {
       },
     }
   );
-  const removemCategoryMutation = useMutation(
+  const removeCategoryMutation = useMutation(
     async (category: Category) => {
       const response = await axios.delete(`/api/category?id=${category.id}`);
       return response.data;
@@ -66,7 +66,7 @@ export default function useCategorySettings(initialValue = null) {
   };
   const removeSelectedCategory = (category) => {
     if (category) {
-      removemCategoryMutation.mutate(category);
+      removeCategoryMutation.mutate(category);
     }
   };
   const categoryForm = useFormik({

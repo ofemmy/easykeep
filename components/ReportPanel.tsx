@@ -122,7 +122,6 @@ export const ReportPanel = ({
                             </p>
                             {trxItem.frequency === "Once" ? (
                               <p className="text-sm mt-1">
-                                Entry Date:
                                 {DateTime.fromJSDate(
                                   new Date(trxItem.entryDate)
                                 ).toLocaleString(DateTime.DATE_FULL)}

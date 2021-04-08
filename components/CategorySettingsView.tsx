@@ -19,7 +19,7 @@ export default function CategorySettingsView({ data }) {
 
   const [trxType, setTrxType] = useState("Expense");
   const [mode, setMode] = useState("add");
-  const { categories: result, isLoading, isError, error } = useCategory();
+  const { result, isLoading, isError, error } = useCategory();
   if (isLoading) {
     return <div>Loading...</div>;
   }

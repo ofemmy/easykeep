@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import { Transition } from "@headlessui/react";
+import { useLocalStorage } from "lib/useLocalStorage";
 import Link from "next/link";
 import useDeleteTransaction from "../lib/useDeleteTransaction";
 import Router from "next/router";
+import { DateTime } from "luxon";
 const TableOptions = ({ trxObject }) => {
   const [isOpen, setIsOpen] = useState(false);
   const mutation = useDeleteTransaction();
+  
+  const { setValue: setTrxToEdit } = useLocalStorage("trxToEdit", trxObject);
   return (
     <div className="relative flex justify-end items-center">
       <button
@@ -45,8 +49,9 @@ const TableOptions = ({ trxObject }) => {
               aria-labelledby="project-options-menu-0"
             >
               <div className="py-1" role="none">
-                <Link href={`/new?id=${trxObject._id}`}>
+                <Link href={`/new?id=${trxObject.id}`}>
                   <a
+                    onClick={() => setTrxToEdit(trxObject)}
                     className="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                     role="menuitem"
                   >
@@ -71,7 +76,7 @@ const TableOptions = ({ trxObject }) => {
               <div className="py-1" role="none">
                 <button
                   onClick={() => {
-                    mutation.mutate(trxObject._id);
+                    mutation.mutate(trxObject.id);
                     setIsOpen(false);
                     //Router.reload();
                   }}

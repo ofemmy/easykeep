@@ -50,21 +50,31 @@ handler
   )
   .post(
     withApiAuthRequired(async (req, res) => {
-      const newPost: Transaction = req.body;
+      const newTrx: Transaction = req.body;
       const { user } = getSession(req, res);
-      newPost.ownerId = user.sub;
-
+      newTrx.ownerId = user.sub;
+      
       //TODO: Serverside validation
       try {
-        if (newPost) {
-          const newTrx = await prisma.transaction.create({ data: newPost });
-          res.status(201).json({ status: "success", data: newTrx });
+        if (!newTrx.id) {
+          const { categoryId, id, ...newtrxData } = newTrx;
+          const result = await prisma.transaction.create({
+            data: {
+              ...newtrxData,
+              category: { connect: { id: Number(categoryId) } },
+            },
+            include: { category: true },
+          });
+          res.status(201).json({ status: "success", data: result });
         }
+        
       } catch (error) {
         console.log(error);
-        res
-          .status(500)
-          .json({ status: "error", msg: "error occured on server" });
+        res.status(500).json({
+          status: "error",
+          msg: "error occured on server",
+          data: null,
+        });
       }
     })
   );

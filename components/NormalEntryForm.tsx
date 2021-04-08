@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { TransactionType } from "@prisma/client";
 import CalenderSVG from "./svgs/CalenderSVG";
+import { useCategory } from "lib/useCategory";
 import Calender from "./Calender";
 import useProfile from "../lib/useProfile";
 import { useDisclosure } from "@chakra-ui/hooks";
 import { capitalize } from "lodash";
+import { DateTime } from "luxon";
 const NormalEntryForm = ({
   handleSubmit,
   handleChange,
@@ -19,20 +21,25 @@ const NormalEntryForm = ({
   const { isOpen, onToggle } = useDisclosure();
   const [isRecurring, setIsRecurring] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  // const {
+  //   userProfile,
+  //   isProfileLoading,
+  //   isProfileError,
+  //   profileError,
+  // } = useProfile();
   const {
-    userProfile,
-    isProfileLoading,
-    isProfileError,
-    profileError,
-  } = useProfile();
-  if (isProfileLoading) {
+    result,
+    isLoading: isLoadingCategories,
+    isError,
+    error,
+  } = useCategory();
+  if (isLoadingCategories) {
     return <span>Loading....</span>;
   }
-  if (isProfileError) {
-    return <span>Error: {profileError}</span>;
+  if (isError) {
+    return <span>Error: {error}</span>;
   }
-  const { categories } = userProfile.profile;
-
+  const { data: categories } = result;
   return (
     <form className="space-y-6 pt-6 pb-5" onSubmit={handleSubmit}>
       <div className="">
@@ -42,7 +49,7 @@ const NormalEntryForm = ({
               id="income"
               name="type"
               type="radio"
-              className="focus:ring-blue-500 h-4 w-4 text-gray-600 border-gray-300"
+              className="focus:ring-secondary h-4 w-4 text-secondary border-gray-300"
               checked={TransactionType.Income === values.type}
               value="Income"
               onChange={handleChange}
@@ -59,7 +66,7 @@ const NormalEntryForm = ({
               id="expense"
               name="type"
               type="radio"
-              className="focus:ring-blue-500 h-4 w-4 text-gray-600 border-gray-300"
+              className="focus:ring-secondary h-4 w-4 text-secondary border-gray-300"
               checked={TransactionType.Expense === values.type}
               value="Expense"
               onChange={handleChange}
@@ -85,12 +92,12 @@ const NormalEntryForm = ({
         >
           Title
         </label>
-        <div className="mt-1">
+        <div>
           <input
             type="text"
             name="title"
             id="title"
-            onBlur={handleBlur}
+            value={values.title}
             className={`${
               errors.title && touched.title
                 ? "border-red-600"
@@ -203,28 +210,29 @@ const NormalEntryForm = ({
         <div className="mt-1">
           <select
             id="category"
-            name="category"
+            name="categoryId"
             className={`${
-              errors.category && touched.category
+              errors.categoryId && touched.categoryId
                 ? "border-red-600"
                 : "border-gray-300"
             } mt-1 block w-full pl-3 pr-10 py-2 text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-sm`}
-            value={values.category}
+            value={values.categoryId}
             onChange={handleChange}
           >
             <option defaultValue="default" disabled>
               Select Category
             </option>
             {categories
-              .sort((a, b) => a.localeCompare(b))
+              .filter((cat) => cat.type === values.type)
+              .sort((a, b) => a.title.localeCompare(b.title))
               .map((cat) => (
-                <option key={cat} defaultValue={cat}>
-                  {capitalize(cat)}
+                <option key={cat.id} value={cat.id}>
+                  {capitalize(cat.title)}
                 </option>
               ))}
           </select>
         </div>
-        {errors.category && touched.category ? (
+        {errors.categoryId && touched.categoryId ? (
           <p className="mt-2 text-sm text-red-600" id="email-error">
             Please select a category
           </p>

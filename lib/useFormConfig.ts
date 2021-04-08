@@ -15,22 +15,22 @@ export default function useFormConfig(formName: FormType) {
       formComponent = NormalEntryForm;
       initialValues = {
         title: "",
-        type: "" as TransactionType,
+        type: TransactionType.Income,
         amount: "",
         frequency: TrxFrequency.Once,
         entryDate: today,
-        category: "",
+        categoryId: "",
       };
       break;
     case "recurringEntryForm":
       formComponent = RecurringEntryForm;
       initialValues = {
         title: "",
-        type: "" as TransactionType,
+        type: TransactionType.Income,
         amount: "",
         frequency: TrxFrequency.Recurring,
         entryDate: today,
-        category: "",
+        categoryId: "",
         recurringFrom: today,
         recurringTo: today.plus({ months: 12 }),
       };
