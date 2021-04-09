@@ -6,7 +6,8 @@ import { useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { DateTime } from "luxon";
 import { useLocalStorage } from "../lib/useLocalStorage";
-import { TrxFrequency } from "@prisma/client";
+import { TrxFrequency, TransactionType } from "@prisma/client";
+import { Toast } from "@/components/Toast";
 export function NonRecurringFormView({ data }) {
   const queryClient = useQueryClient();
   const { removeValue } = useLocalStorage("trxToEdit", null);
@@ -14,7 +15,7 @@ export function NonRecurringFormView({ data }) {
   const router = useRouter();
   let initialTrxData = null;
   if (data) {
-    initialTrxData = data.frequency === TrxFrequency.Recurring ? data : null;
+    initialTrxData = data.frequency === TrxFrequency.Once ? data : null;
   }
   const mutation = useMutation(
     async (data: any) => {
@@ -27,12 +28,11 @@ export function NonRecurringFormView({ data }) {
     {
       onSuccess: (responseData) => {
         toast({
-          title: "Success.",
-          description: "Transaction saved successfully.",
-          status: "success",
-          duration: 2000,
-          isClosable: true,
-          position: "top-right",
+          duration: 3000,
+          position: "top",
+          render: () => (
+            <Toast status="success" message="Entry saved successfully." />
+          ),
         });
         queryClient.invalidateQueries("transactions");
       },
@@ -43,6 +43,7 @@ export function NonRecurringFormView({ data }) {
   );
   const removeFromLocalStorage = () => {
     removeValue("trxToEdit");
+    router.query.id = null;
   };
   return (
     <main
@@ -67,8 +68,18 @@ export function NonRecurringFormView({ data }) {
                 initialValues={initialTrxData || initialValues}
                 validationSchema={schema}
                 onSubmit={(values, actions) => {
+                  console.log(values);
                   mutation.mutate(values);
-                  actions.resetForm();
+                  actions.resetForm({
+                    values: {
+                      title: "",
+                      type: TransactionType.Income,
+                      amount: "",
+                      frequency: TrxFrequency.Once,
+                      entryDate: DateTime.utc(),
+                      categoryId: "",
+                    },
+                  });
                   removeFromLocalStorage();
                 }}
                 component={formComponent}

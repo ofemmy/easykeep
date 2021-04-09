@@ -94,6 +94,7 @@ const RecurringEntryForm = ({
             name="title"
             id="title"
             onBlur={handleBlur}
+            value={values.title}
             className={`${
               errors.title && touched.title
                 ? "border-red-600"
@@ -350,11 +351,10 @@ const RecurringEntryForm = ({
                 : "border-gray-300"
             } mt-1 block w-full pl-3 pr-10 py-2 text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-sm`}
             value={values.categoryId}
+            defaultValue={values.categoryId || "default"}
             onChange={handleChange}
           >
-            <option defaultValue="default" disabled>
-              Select Category
-            </option>
+            <option value="default">Select Category</option>
             {categories
               .filter((cat) => cat.type === values.type)
               .sort((a, b) => a.title.localeCompare(b.title))

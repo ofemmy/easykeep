@@ -53,23 +53,47 @@ handler
       const newTrx: Transaction = req.body;
       const { user } = getSession(req, res);
       newTrx.ownerId = user.sub;
-      
+
       //TODO: Serverside validation
       try {
-        if (!newTrx.id) {
-          const { categoryId, id, ...newtrxData } = newTrx;
-          const result = await prisma.transaction.create({
-            data: {
-              ...newtrxData,
-              category: { connect: { id: Number(categoryId) } },
-            },
-            include: { category: true },
-          });
-          res.status(201).json({ status: "success", data: result });
-        }
-        
+        const { categoryId, id, ...newtrxData } = newTrx;
+        const result = await prisma.transaction.create({
+          data: {
+            ...newtrxData,
+            category: { connect: { id: Number(categoryId) } },
+          },
+          include: { category: true },
+        });
+        res.status(201).json({ status: "success", data: result });
       } catch (error) {
         console.log(error);
+        res.status(500).json({
+          status: "error",
+          msg: "error occured on server",
+          data: null,
+        });
+      }
+    })
+  )
+  .put(
+    withApiAuthRequired(async (req, res) => {
+      console.log("here");
+      const trxData = req.body;
+      try {
+        const { categoryId, id, ...updatedTrxData } = trxData;
+        const result = await prisma.transaction.update({
+          where: { id: trxData.id },
+          data: {
+            ...updatedTrxData,
+            categoryId: Number(trxData.categoryId),
+          },
+        });
+        return res.status(204).send({
+          status: "success",
+          data: result,
+          msg: "entry successfully updated",
+        });
+      } catch (error) {
         res.status(500).json({
           status: "error",
           msg: "error occured on server",

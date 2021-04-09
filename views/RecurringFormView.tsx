@@ -3,11 +3,14 @@ import { Formik } from "formik";
 import { useRouter } from "next/router";
 import { useMutation, useQueryClient } from "react-query";
 import { useToast } from "@chakra-ui/react";
-import { TrxFrequency } from "@prisma/client";
+import { DateTime } from "luxon";
+import { TrxFrequency, TransactionType } from "@prisma/client";
+import { Toast } from "@/components/Toast";
 import axios from "axios";
-export function RecurringFormView(data) {
+export function RecurringFormView({ data }) {
   const queryClient = useQueryClient();
   const toast = useToast();
+  const today = DateTime.utc();
   let initialTrxData = null;
   if (data) {
     initialTrxData = data.frequency === TrxFrequency.Recurring ? data : null;
@@ -24,12 +27,11 @@ export function RecurringFormView(data) {
     {
       onSuccess: (responseData) => {
         toast({
-          title: "Success.",
-          description: "Transaction saved successfully.",
-          status: "success",
-          duration: 2000,
-          isClosable: true,
-          position: "top-right",
+          duration: 3000,
+          position: "top",
+          render: () => (
+            <Toast status="success" message="Entry saved successfully." />
+          ),
         });
         queryClient.invalidateQueries("transactions");
       },
@@ -39,6 +41,7 @@ export function RecurringFormView(data) {
   const { formComponent, initialValues, schema } = useFormConfig(
     "recurringEntryForm"
   );
+  console.log(initialTrxData);
   return (
     <main
       className="flex-1 relative z-0 overflow-y-auto focus:outline-none px-0 md:px-0"
@@ -64,7 +67,18 @@ export function RecurringFormView(data) {
                 onSubmit={(values, actions) => {
                   console.log(values);
                   mutation.mutate(values);
-                  actions.resetForm(initialValues);
+                  actions.resetForm({
+                    values: {
+                      title: "",
+                      type: TransactionType.Income,
+                      amount: "",
+                      frequency: TrxFrequency.Recurring,
+                      entryDate: today,
+                      categoryId: "",
+                      recurringFrom: today,
+                      recurringTo: today.plus({ months: 12 }),
+                    },
+                  });
                 }}
                 component={formComponent}
               />

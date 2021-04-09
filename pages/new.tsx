@@ -10,25 +10,23 @@ import { RecurringFormView } from "views/RecurringFormView";
 import { useLocalStorage } from "../lib/useLocalStorage";
 
 export default withPageAuthRequired(function New() {
-  const { pageLinks, activeLink, setActiveLink } = usePageLink(
-    Object.keys(TrxFrequency),
-    TrxFrequency.Once
-  );
   const router = useRouter();
   const { value: trxToEdit } = useLocalStorage("trxToEdit", null);
   const trxId = router.query?.id as string;
   let data = null;
   if (trxId) {
-    data =
-      trxToEdit.id === parseInt(router.query.id as string) ? trxToEdit : null;
+    data = trxToEdit?.id === parseInt(trxId) ? trxToEdit : null;
   }
-
   if (data) {
     data.entryDate = data.entryDate && DateTime.fromISO(data.entryDate);
     data.recurringFrom =
       data.recurringFrom && DateTime.fromISO(data.recurringFrom);
     data.recurringTo = data.recurringTo && DateTime.fromISO(data.recurringTo);
   }
+  const { pageLinks, activeLink, setActiveLink } = usePageLink(
+    Object.keys(TrxFrequency),
+    data?.frequency || TrxFrequency.Once
+  );
   const ActivePage = ({ activeLink, data }) => {
     if (activeLink == TrxFrequency.Once)
       return <NonRecurringFormView data={data} />;
