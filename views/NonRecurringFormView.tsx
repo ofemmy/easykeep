@@ -35,6 +35,19 @@ export function NonRecurringFormView({ data }) {
           ),
         });
         queryClient.invalidateQueries("transactions");
+        queryClient.invalidateQueries("recurrings");
+      },
+      onError: () => {
+        toast({
+          duration: 3000,
+          position: "top",
+          render: () => (
+            <Toast
+              status="error"
+              message="Something went wrong, please try again"
+            />
+          ),
+        });
       },
     }
   );

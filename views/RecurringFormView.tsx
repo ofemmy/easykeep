@@ -34,6 +34,7 @@ export function RecurringFormView({ data }) {
           ),
         });
         queryClient.invalidateQueries("transactions");
+        queryClient.invalidateQueries("recurrings");
       },
     }
   );
@@ -41,7 +42,6 @@ export function RecurringFormView({ data }) {
   const { formComponent, initialValues, schema } = useFormConfig(
     "recurringEntryForm"
   );
-  console.log(initialTrxData);
   return (
     <main
       className="flex-1 relative z-0 overflow-y-auto focus:outline-none px-0 md:px-0"
@@ -65,7 +65,7 @@ export function RecurringFormView({ data }) {
                 initialValues={initialTrxData || initialValues}
                 validationSchema={schema}
                 onSubmit={(values, actions) => {
-                  console.log(values);
+                  
                   mutation.mutate(values);
                   actions.resetForm({
                     values: {

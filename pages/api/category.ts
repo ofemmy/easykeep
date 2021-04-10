@@ -16,10 +16,12 @@ handler
   .get(
     withApiAuthRequired(async (req, res) => {
       const { user } = getSession(req, res);
+      console.log(user.sub);
       try {
         const categories = await prisma.category.findMany({
           where: { ownerId: user.sub },
         });
+
         return res.status(200).send({ status: "success", data: categories });
       } catch (error) {
         console.log(error);

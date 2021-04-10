@@ -21,12 +21,12 @@ const NormalEntryForm = ({
   const { isOpen, onToggle } = useDisclosure();
   const [isRecurring, setIsRecurring] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  // const {
-  //   userProfile,
-  //   isProfileLoading,
-  //   isProfileError,
-  //   profileError,
-  // } = useProfile();
+  const {
+    userProfile,
+    isProfileLoading,
+    isProfileError,
+    profileError,
+  } = useProfile();
   const {
     result,
     isLoading: isLoadingCategories,

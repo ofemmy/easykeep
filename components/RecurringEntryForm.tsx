@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import { Router, useRouter } from "next/router";
 import { TransactionType } from "@prisma/client";
 import CalenderSVG from "./svgs/CalenderSVG";
 import { DateTime } from "luxon";
@@ -16,13 +16,19 @@ const RecurringEntryForm = ({
   errors,
   touched,
   setFieldValue,
+  editMode = false,
+  closeHandler = null,
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const { isOpen: isCalFromOpen, onToggle: onCalFromToggle } = useDisclosure();
   const { isOpen: isCalToOpen, onToggle: onCalToToggle } = useDisclosure();
   const { isOpen, onToggle } = useDisclosure();
-
+  const handleClose = closeHandler
+    ? closeHandler
+    : () => {
+        router.back();
+      };
   const {
     result,
     isLoading: isCategoriesLoading,
@@ -375,7 +381,7 @@ const RecurringEntryForm = ({
         <button
           type="button"
           className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          onClick={() => router.back()}
+          onClick={handleClose}
         >
           Cancel
         </button>
@@ -390,7 +396,7 @@ const RecurringEntryForm = ({
             } hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
             disabled={isLoading}
           >
-            {isLoading ? "Saving..." : "Save"}
+            {editMode ? "Update" : "Save"}
           </button>
         </div>
       </div>

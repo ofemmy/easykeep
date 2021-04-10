@@ -45,7 +45,7 @@ export default withPageAuthRequired(function New() {
             <select
               id="tabs"
               name="tabs"
-              className="block w-full focus:ring-indigo-500 focus:border-gray-500 border-gray-300 rounded-md p-2"
+              className="block w-full focus:ring-secondary-500 focus:border-gray-500 border-gray-300 rounded-md p-2"
             >
               <option selected>Non-recurring Entry</option>
               <option>Recurring Entry</option>

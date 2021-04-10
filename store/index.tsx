@@ -8,6 +8,7 @@ import Currency from "../types/Currency";
 import AddSVG from "../components/svgs/AddSVG";
 import { DateTime } from "luxon";
 import ChartSVG from "../components/svgs/ChartSVG";
+import { TrendingSVG } from "../components/svgs/TrendingSVG";
 export const Months = [
   { code: 1, name: "January" },
   { code: 2, name: "February" },
@@ -70,6 +71,12 @@ const AppMainLinks = {
     name: "Expenses",
     color: "hsl(0, 100%, 50%)",
     icon: <CardSVG customClasses="mr-4" />,
+  },
+  recurrings: {
+    href: "/transactions/recurrings",
+    name: "Recurrings",
+    color: "hsl(32, 100%, 50%)",
+    icon: <TrendingSVG customClasses="mr-4" />,
   },
   report: {
     href: "/report",
