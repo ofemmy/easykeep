@@ -4,7 +4,7 @@ import { withApiAuthRequired, getSession } from "@auth0/nextjs-auth0";
 import prisma from "../../../db/prisma";
 import { useDate } from "../../../lib/useDate";
 import { Transaction } from "@prisma/client";
-import { fetchSum } from "../../../db/queries";
+import { Prisma } from "@prisma/client";
 import { fetchSumByType } from "../../../db/queries/fetchSumByType";
 import { fetchTransactions } from "../../../db/queries/fetchTransactions";
 
@@ -53,18 +53,32 @@ handler
       const newTrx: Transaction = req.body;
       const { user } = getSession(req, res);
       newTrx.ownerId = user.sub;
-
+      console.log(newTrx);
       //TODO: Serverside validation
       try {
         const { categoryId, id, ...newtrxData } = newTrx;
-        const result = await prisma.transaction.create({
+        const category = await prisma.category.findFirst({
+          where: { id: Number(newTrx.categoryId) },
+        });
+        category.runningBudget = category.budget.equals(0)
+          ? new Prisma.Decimal(0)
+          : category.runningBudget.minus(newtrxData.amount);
+        const updateCategory = prisma.category.update({
+          where: { id: category.id },
+          data: category,
+        });
+        const createTrx = prisma.transaction.create({
           data: {
             ...newtrxData,
             category: { connect: { id: Number(categoryId) } },
           },
           include: { category: true },
         });
-        res.status(201).json({ status: "success", data: result });
+        const [cat, createdTrx] = await prisma.$transaction([
+          updateCategory,
+          createTrx,
+        ]);
+        res.status(201).json({ status: "success", data: createdTrx });
       } catch (error) {
         console.log(error);
         res.status(500).json({
@@ -77,28 +91,82 @@ handler
   )
   .put(
     withApiAuthRequired(async (req, res) => {
-      console.log("here");
       const trxData = req.body;
       try {
         const { categoryId, id, ...updatedTrxData } = trxData;
-        const result = await prisma.transaction.update({
+        const trx = await prisma.transaction.findFirst({ where: { id } });
+        const category = await prisma.category.findFirst({
+          where: { id: categoryId },
+        });
+        const difference = trx.amount.minus(trxData.amount);
+
+        category.runningBudget = category.budget.equals(0)
+          ? new Prisma.Decimal(0)
+          : category.runningBudget.plus(difference);
+        const updateCategory = prisma.category.update({
+          where: { id: Number(category.id) },
+          data: category,
+        });
+        const updateTrx = prisma.transaction.update({
           where: { id: trxData.id },
           data: {
             ...updatedTrxData,
             categoryId: Number(trxData.categoryId),
           },
         });
+        const [_, result] = await prisma.$transaction([
+          updateCategory,
+          updateTrx,
+        ]);
         return res.status(204).send({
           status: "success",
           data: result,
-          msg: "entry successfully updated",
+          msg: "Entry successfully updated",
         });
       } catch (error) {
+        console.log(error);
         res.status(500).json({
           status: "error",
           msg: "error occured on server",
           data: null,
         });
+      }
+    })
+  )
+  .delete(
+    withApiAuthRequired(async (req, res) => {
+      const trxId = +req.query.id;
+      const { user } = getSession(req, res);
+      const ownerId = user.sub;
+      if (!trxId) {
+        return res
+          .status(400)
+          .send({ status: "error", msg: "Invalid request", data: null });
+      }
+      try {
+        const trx = await prisma.transaction.findFirst({
+          where: { id: trxId },
+          include: { category: true },
+        });
+        const category = trx.category;
+        //if no budget is set no need to update recurring budget
+        category.runningBudget = category.budget.equals(0)
+          ? new Prisma.Decimal(0)
+          : category.runningBudget.plus(trx.amount);
+        const delTrx = prisma.transaction.delete({
+          where: { id: trxId },
+        });
+        const updateCategory = prisma.category.update({
+          where: { id: category.id },
+          data: category,
+        });
+        const result = await prisma.$transaction([updateCategory, delTrx]);
+        return res.status(204).send({ status: "success", data: null });
+      } catch (error) {
+        console.log(error);
+        return res
+          .status(500)
+          .send({ status: "error", msg: "Server error", data: null });
       }
     })
   );

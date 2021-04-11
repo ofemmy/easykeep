@@ -81,7 +81,6 @@ export function NonRecurringFormView({ data }) {
                 initialValues={initialTrxData || initialValues}
                 validationSchema={schema}
                 onSubmit={(values, actions) => {
-                  console.log(values);
                   mutation.mutate(values);
                   actions.resetForm({
                     values: {

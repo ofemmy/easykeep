@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import prisma from "../../db/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import nc from "next-connect";
@@ -38,18 +39,6 @@ handler
       }
       newCategory.ownerId = user.sub;
       try {
-        //use id field to determine edit or create mode
-        if (newCategory.id) {
-          const newData = await prisma.category.update({
-            where: { id: newCategory.id },
-            data: newCategory,
-          });
-          return res.status(200).send({
-            status: "success",
-            msg: "Category updated successfully",
-            data: newData,
-          });
-        }
         const alreadyExists = await prisma.category.findFirst({
           where: {
             title: {
@@ -74,6 +63,38 @@ handler
             data,
           });
         }
+      } catch (error) {
+        console.log(error);
+        return res.status(404).send({
+          status: "error",
+          msg: "Internal server error",
+          data: null,
+        });
+      }
+    })
+  )
+  .put(
+    withApiAuthRequired(async (req, res) => {
+      const category: Category = req.body;
+      try {
+        const cat = await prisma.category.findFirst({
+          where: { id: category.id },
+        });
+        const difference = new Prisma.Decimal(category.budget).minus(
+          cat.budget
+        );
+        category.runningBudget = cat.budget.equals(0)
+          ? new Prisma.Decimal(0)
+          : cat.runningBudget.plus(difference);
+        const editedCategory = await prisma.category.update({
+          where: { id: category.id },
+          data: category,
+        });
+        return res.status(200).send({
+          status: "success",
+          msg: "Category updated successfully",
+          data: editedCategory,
+        });
       } catch (error) {
         console.log(error);
         return res.status(404).send({

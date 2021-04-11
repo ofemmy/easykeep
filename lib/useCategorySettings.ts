@@ -17,9 +17,34 @@ const validationSchema = Yup.object({
 export default function useCategorySettings(initialValue = null) {
   const queryClient = useQueryClient();
   const toast = useToast();
-  const mutation = useMutation(
+  const addCategoryMutation = useMutation(
     async (newCategory) => {
       const response = await axios.post("/api/category", newCategory);
+      return response.data;
+    },
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries("category");
+        toast({
+          description: data.msg,
+          status: data.status,
+          duration: 2000,
+          position: "top",
+        });
+      },
+      onError: (error) => {
+        toast({
+          description: error["response"]["data"]["msg"],
+          status: "error",
+          duration: 2000,
+          position: "top",
+        });
+      },
+    }
+  );
+  const editCategoryMutation = useMutation(
+    async (category: Category) => {
+      const response = await axios.put("/api/category", category);
       return response.data;
     },
     {
@@ -60,14 +85,16 @@ export default function useCategorySettings(initialValue = null) {
     }
   );
   const addNewCategory = (category) => {
-    if (category) {
-      mutation.mutate(category);
-    }
+    if (!category) return;
+    addCategoryMutation.mutate(category);
   };
   const removeSelectedCategory = (category) => {
-    if (category) {
-      removeCategoryMutation.mutate(category);
-    }
+    if (!category) return;
+    removeCategoryMutation.mutate(category);
+  };
+  const editCategory = (category) => {
+    if (!category) return;
+    editCategoryMutation.mutate(category);
   };
   const categoryForm = useFormik({
     initialValues: {
@@ -81,7 +108,12 @@ export default function useCategorySettings(initialValue = null) {
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: (values, actions) => {
-      addNewCategory(values);
+      if (!values["id"]) {
+        values.runningBudget = values.budget;
+        addNewCategory(values);
+      } else {
+        editCategory(values);
+      }
       actions.resetForm({
         values: initialValue,
       });
@@ -98,14 +130,8 @@ export default function useCategorySettings(initialValue = null) {
     forOwn(category, (value, key) =>
       categoryForm.setFieldValue(key, value, false)
     );
-    console.log(category);
   };
-  // const deleteCategory = (category) => {
-  //   mutation.mutate({
-  //     newData: category,
-  //     action: "delete",
-  //   });
-  // };
+
   return {
     categoryForm,
     selectedCategory,

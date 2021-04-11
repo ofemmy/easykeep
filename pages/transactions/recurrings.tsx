@@ -41,6 +41,7 @@ function EditForm({ onClose, initData }) {
         });
         queryClient.invalidateQueries("transactions");
         queryClient.invalidateQueries("recurrings");
+        onClose();
       },
     }
   );
@@ -64,7 +65,6 @@ function EditForm({ onClose, initData }) {
           validationSchema={schema}
           onSubmit={(values) => {
             mutation.mutate(values);
-            onClose();
           }}
         />
       </div>
@@ -85,6 +85,8 @@ export default withPageAuthRequired(function Recurrings() {
     Object.keys(TransactionType),
     TransactionType.Expense
   );
+  const toast = useToast();
+  const queryClient = useQueryClient();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { setValue: setTrxToEdit } = useLocalStorage("trxToEdit", null);
   const trxRef = useRef(null);
@@ -92,6 +94,25 @@ export default withPageAuthRequired(function Recurrings() {
     trxRef.current = currentTrx;
     onOpen();
   };
+  const deleteMutation = useMutation(
+    async (data: any) => {
+      return await axios.delete(`/api/transactions?id=${data}`);
+    },
+    {
+      onSuccess: (responseData) => {
+        toast({
+          duration: 3000,
+          position: "top",
+          render: () => (
+            <Toast status="success" message="Entry deleted successfully." />
+          ),
+        });
+        queryClient.invalidateQueries("transactions");
+        queryClient.invalidateQueries("recurrings");
+        onClose();
+      },
+    }
+  );
   const { data: queryResponse, isLoading, isError, error } = useQuery(
     ["recurrings", activeLink],
     () =>
@@ -200,14 +221,16 @@ export default withPageAuthRequired(function Recurrings() {
 
                           <div className="flex">
                             <button
-                              onClick={() => {}}
+                              onClick={() => openModal(trx)}
                               type="button"
                               className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
                             >
-                              Stop
+                              Edit
                             </button>
                             <button
-                              onClick={() => {}}
+                              onClick={() =>
+                                deleteMutation.mutate(trx.id)
+                              }
                               type="button"
                               className="inline-flex ml-2 items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                             >
@@ -299,7 +322,9 @@ export default withPageAuthRequired(function Recurrings() {
                                   Edit
                                 </button>
                                 <button
-                                  onClick={() => {}}
+                                  onClick={() =>
+                                    deleteMutation.mutate(trx.id)
+                                  }
                                   type="button"
                                   className="inline-flex ml-2 items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                                 >
